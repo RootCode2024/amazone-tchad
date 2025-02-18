@@ -138,7 +138,8 @@ const formErrors = ref({
     return_date: { error: false, message: "Veuillez sélectionner une date de retour." },
     name: { error: false, message: "Veuillez saisir votre nom." },
     email: { error: false, message: "Veuillez saisir une adresse email valide." },
-    phone: { error: false, message: "Veuillez saisir un numéro de téléphone valide." }
+    phone: { error: false, message: "Veuillez saisir un numéro de téléphone valide." },
+    dates: { error: false, message: "La date du départ doit être inferieur à la date de retour." },
 });
 
 // Changer de step
@@ -190,16 +191,33 @@ const submitForm = async () => {
         showError(formErrors.value.customerInfo.message);
         return;
     }
+    if (form.value.flight_type != 'one_way' && form.value.departure_date < form.value.return_date)
+    {
+        formErrors.value.dates.error = true;
+    }
     console.log(form.value);
 
     try {
         buttonLoading.value = true;
         await axios.post(`${baseUrl}/flights`, form.value);
-        showSummary();
     } catch (error) {
         showError("Échec de la soumission. Vérifiez votre connexion.");
     } finally {
         buttonLoading.value = false;
+        step.value = 1;
+
+        form.value.flight_type = "one_way";
+        form.value.departure_city_id =  1;
+        form.value.destination_city_id =  2;
+        form.value.departure_date =  "";
+        form.value.return_date =  "";
+        form.value.passengers =  1;
+        form.value.flight_class =  "economy";
+        form.value.name =  "";
+        form.value.email =  "";
+        form.value.phone =  "";
+
+        toastFunction('success', 'Votre reservation a été soumise avec succès.')
     }
 };
 
@@ -217,24 +235,21 @@ const showError = (message) => {
     });
 };
 
-const showSummary = () => {
-    Swal.fire({
-        title: "Récapitulatif de la réservation",
-        html: `
-            <b>Type de vol :</b> ${form.value.flight_type}<br>
-            <b>Ville de départ :</b> ${form.value.departure_city_id}<br>
-            <b>Ville d'arrivée :</b> ${form.value.destination_city_id}<br>
-            <b>Date de départ :</b> ${form.value.departure_date}<br>
-            <b>Date de retour :</b> ${form.value.return_date || "Non applicable"}<br>
-            <b>Passagers :</b> ${form.value.passengers}<br>
-            <b>Classe :</b> ${form.value.flight_class}<br>
-            <hr>
-            <b>Nom :</b> ${form.value.name}<br>
-            <b>Email :</b> ${form.value.email}<br>
-            <b>Téléphone :</b> ${form.value.phone}
-        `,
-        icon: "success",
-        confirmButtonText: "OK",
+const toastFunction = (type, message) => {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+      }
     });
-};
+    Toast.fire({
+      icon: type,
+      title: message
+    });
+  };
 </script>

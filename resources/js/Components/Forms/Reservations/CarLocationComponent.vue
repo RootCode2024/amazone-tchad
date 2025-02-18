@@ -162,7 +162,7 @@ const submitForm = async () => {
     try {
         buttonLoading.value = true;
         await axios.post(`${baseUrl}/car-locations`, form.value);
-        showSummary();
+        // showSummary();
     } catch (error) {
         showError("Échec de la soumission. Vérifiez votre connexion.");
     } finally {
@@ -183,21 +183,21 @@ const showError = (message) => {
     });
 };
 
-const showSummary = () => {
-    Swal.fire({
-        title: "Récapitulatif de la réservation",
-        html: `
-            <b>Lieu de location :</b> ${form.value.place_of_location}<br>
-            <b>Date de début :</b> ${form.value.started_date}<br>
-            <b>Date de fin :</b> ${form.value.ended_date}<br>
-            <b>Âge du conducteur :</b> ${form.value.age}<br>
-            <hr>
-            <b>Nom :</b> ${form.value.name}<br>
-            <b>Email :</b> ${form.value.email}<br>
-            <b>Téléphone :</b> ${form.value.phone}
-        `,
-        icon: "success",
-        confirmButtonText: "OK",
-    });
-};
+// const showSummary = () => {
+//     Swal.fire({
+//         title: "Récapitulatif de la réservation",
+//         html: `
+//             <b>Lieu de location :</b> ${form.value.place_of_location}<br>
+//             <b>Date de début :</b> ${form.value.started_date}<br>
+//             <b>Date de fin :</b> ${form.value.ended_date}<br>
+//             <b>Âge du conducteur :</b> ${form.value.age}<br>
+//             <hr>
+//             <b>Nom :</b> ${form.value.name}<br>
+//             <b>Email :</b> ${form.value.email}<br>
+//             <b>Téléphone :</b> ${form.value.phone}
+//         `,
+//         icon: "success",
+//         confirmButtonText: "OK",
+//     });
+// };
 </script>

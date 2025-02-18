@@ -26,6 +26,7 @@ class HotelController extends Controller
     public function store(HotelRequestStore $request)
     {
         Log::info('Hotel Request Data: ', $request->all());
+        
         try {
             $customer = Customer::where('email', $request->email)->first();
     

@@ -1,126 +1,86 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nouvelle réservation - {{ strtoupper($type) }}</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 600px;
-            margin: 20px auto;
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        .header {
-            background: #007bff;
-            color: #fff;
-            text-align: center;
-            padding: 20px;
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
-        }
-        .header img {
-            max-width: 80px;
-            margin-bottom: 10px;
-        }
-        .title {
-            font-size: 22px;
-            font-weight: bold;
-            margin: 0;
-        }
-        .details {
-            padding: 20px;
-            font-size: 16px;
-            color: #333;
-        }
-        .details p {
-            margin: 10px 0;
-            display: flex;
-            align-items: center;
-        }
-        .details p strong {
-            width: 150px;
-            display: inline-block;
-        }
-        .icon {
-            width: 18px;
-            margin-right: 10px;
-        }
-        .button {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .button a {
-            background: #007bff;
-            color: #ffffff;
-            text-decoration: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            display: inline-block;
-            transition: 0.3s;
-        }
-        .button a:hover {
-            background: #0056b3;
-        }
-        .footer {
-            text-align: center;
-            font-size: 14px;
-            color: #666;
-            padding: 15px;
-            background: #f8f8f8;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-
-    <div class="container">
-        <div class="header">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRfLBpmdBKyB-xVj0Pf_BsXjWBUQWe8CEujg&s" alt="Logo">
-            <p class="title">Nouvelle réservation ({{ strtoupper($type) }})</p>
-        </div>
-
-        <div class="details">
-            <p><img src="https://img.icons8.com/ios/50/user.png" class="icon"><strong>Nom du client :</strong> {{ $reservation->customer->name }}</p>
-            <p><img src="https://img.icons8.com/ios/50/email.png" class="icon"><strong>Email :</strong> {{ $reservation->customer->email }}</p>
-            <p><img src="https://img.icons8.com/ios/50/phone.png" class="icon"><strong>Téléphone :</strong> {{ $reservation->customer->phone }}</p>
-
-            <p><img src="https://img.icons8.com/ios/50/airport.png" class="icon"><strong>Origine :</strong> {{ $reservation->origin->name }}</p>
-            <p><img src="https://img.icons8.com/ios/50/airplane.png" class="icon"><strong>Destination :</strong> {{ $reservation->destination->name }}</p>
-            <p><img src="https://img.icons8.com/ios/50/calendar.png" class="icon"><strong>Date de départ :</strong> {{ $reservation->departure_date }}</p>
-            <p><img src="https://img.icons8.com/ios/50/calendar.png" class="icon"><strong>Date de retour :</strong> {{ $reservation->return_date ?? 'Non applicable' }}</p>
-            <p><img src="https://img.icons8.com/ios/50/user-group-man-man.png" class="icon"><strong>Passagers :</strong> {{ $reservation->passengers }}</p>
-            <p><img src="https://img.icons8.com/ios/50/classroom.png" class="icon"><strong>Classe :</strong>
-                @if ($reservation->flight_class === 'economy')
-                    Économie
-                @elseif ($reservation->flight_class === 'business')
-                    Affaire
-                @else
-                    Première
-                @endif
-            </p>
-        </div>
-
-        <div class="button">
-            <a href="{{ url('/bookings') }}">Voir la réservation</a>
-        </div>
-
-        <div class="footer">
-            <p>Ceci est un message automatique, merci de ne pas y répondre.</p>
-        </div>
+<body style="background-color: #f3f4f6; font-family: Arial, sans-serif; padding: 20px;">
+    <div>
+        <img src="{{ asset('Assets/Images/background.jpg') }}" alt="" class="h-24">
     </div>
+    <table align="center" width="100%" cellspacing="0" cellpadding="0">
+        <tr>
+        <td align="center">
+            <table width="600" style="background-color: #ffffff; padding: 20px; border-radius: 10px;">
+            <tr>
+                <td align="center" style="padding-bottom: 20px;">
+                <h2 style="color: #1e40af; font-size: 24px;">✈️ Nouvelle réservation de vol</h2>
+                <p style="color: #374151; font-size: 16px;">Bonjour <strong>Admin</strong>,</p>
+                <p style="color: #4b5563;">Une nouvelle réservation de vol a été soumise sur <strong>Amazone Tchad</strong>. Voici les détails :</p>
+                </td>
+            </tr>
 
+            <tr>
+                <td style="padding: 20px; background-color: #eff6ff; border-radius: 8px;">
+                <table width="100%">
+                    <tr>
+                    <td style="padding: 10px 0;"><strong>Numéro de réservation :</strong></td>
+                    <td style="padding: 10px 0; color: #1e40af;">FL{{ $reservation->id }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 0;"><strong>Type de Vol :</strong></td>
+                        <td style="padding: 10px 0; color: #1e40af;">
+                            @if ($reservation->flight_type === 'one_way')
+                                Aller Simple
+                            @elseif($reservation->flight_type === 'round_trip')
+                                Aller Retour
+                            @else
+                                Multi Destination
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
+                    <td style="padding: 10px 0;"><strong>Client :</strong></td>
+                    <td style="padding: 10px 0;">{{ $reservation->customer->name }}</td>
+                    </tr>
+                    <tr>
+                    <td style="padding: 10px 0;"><strong>Départ :</strong></td>
+                    <td style="padding: 10px 0;">{{ $reservation->origin->name }}</td>
+                    </tr>
+                    <tr>
+                    <td style="padding: 10px 0;"><strong>Retour :</strong></td>
+                    <td style="padding: 10px 0;">{{ $reservation->destination->name }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 0;"><strong>Date de départ & de retour :</strong></td>
+                        <td style="padding: 10px 0;">{{ $reservation->departure_date }} @if($reservation->flight_type != 'one_way') - {{ $reservation->return_date }}@endif</td>
+                    </tr>
+                    <tr>
+                    <td style="padding: 10px 0;"><strong>Classe :</strong></td>
+                    <td style="padding: 10px 0;">
+                        @if ($reservation->flight_class === 'business')
+                            Affaire
+                        @elseif($reservation->flight_class === 'economy')
+                            Economie
+                        @else
+                            Première
+                        @endif
+                    </td>
+                    </tr>
+                </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td align="center" style="padding-top: 20px;">
+                <p style="color: #4b5563;">Connectez-vous à votre tableau de bord pour traiter cette réservation.</p>
+                <a href="{{ config('app.url') }}/dashboard" style="background-color: #1e40af; color: #ffffff; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold;">Accéder au tableau de bord</a>
+                </td>
+            </tr>
+            </table>
+        </td>
+        </tr>
+    </table>
 </body>
 </html>

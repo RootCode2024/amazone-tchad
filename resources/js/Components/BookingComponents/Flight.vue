@@ -96,15 +96,15 @@
         <form @submit.prevent="updateStatus" v-if="selectedStatus === 'rejected'" class="mt-4">
           <div class="py-2">
             <label for="reason" class="block mb-2">Raison du rejet :</label>
-            <textarea v-model="formRejectedStatus.rejectionReason" id="reason" placeholder="Nous avons pas pu trouver un vol pour la date demandé mais ..." class="w-full border p-2 rounded-lg"></textarea>
+            <textarea v-model="formStatus.reason" id="reason" placeholder="Nous avons pas pu trouver un vol pour la date demandé mais ..." class="w-full border p-2 rounded-lg"></textarea>
           </div>
           <div class="py-2">
             <label for="departure_date">Date de départ</label>
-            <input type="date" v-model="formRejectedStatus.departureDate" class="w-full border p-2 rounded-lg" />
+            <input type="date" v-model="formStatus.departureDate" class="w-full border p-2 rounded-lg" />
           </div>
           <div class="py-2">
             <label for="price">Prix</label>
-            <input type="number" v-model="formRejectedStatus.price" class="w-full border p-2 rounded-lg" />
+            <input type="number" v-model="formStatus.price" class="w-full border p-2 rounded-lg" />
           </div>
           <div class="flex justify-end mt-4">
             <button @click="closeModalFlight" class="px-4 py-2 bg-gray-300 rounded-lg mr-2">Annuler</button>
@@ -121,9 +121,9 @@
           </div>
         </form>
         <form @submit.prevent="updateStatus" v-else>
-          <div class="py-2">
-            <label for="departure_date">Prix</label>
-            <input type="number" name="price" id="price" v-model="price" />
+          <div class="py-2" v-if="selectedStatus === 'approved'">
+            <label for="price">Prix</label>
+            <input type="number" v-model="formStatus.price" class="w-full border p-2 rounded-lg" />
           </div>
           <div class="my-2" v-if="!takeNote">
             <button
@@ -143,7 +143,7 @@
               <textarea
                 id="note"
                 name="note"
-                v-model="note"
+                v-model="formStatus.reason"
                 class="w-full border p-2 rounded-lg"
                 placeholder="Saisissez votre note ici..."
               ></textarea>
@@ -165,19 +165,17 @@
             </button>
           </div>
         </form>
-
-
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-  import { ref, computed, defineProps } from "vue";
   import { Eye, Trash, Plus } from "lucide-vue-next";
-  import axios from "axios";
+  import { ref, computed, defineProps } from "vue";
   import AppDatas from "../../Services/app.js";
   import Swal from 'sweetalert2';
+  import axios from "axios";
 
   const props = defineProps({
     flights: {
@@ -196,12 +194,12 @@
   const isModalOpen = ref(false);
   const selectedFlight = ref(null);
   const selectedStatus = ref("");
-  const note = ref("");
   const buttonLoading = ref(false);
 
-  const formRejectedStatus = ref({
-    newStatus: "rejected",
-    rejectionReason: "",
+
+  const formStatus = ref({
+    newStatus: "",
+    reason: "",
     departureDate: "",
     price: "",
   });
@@ -211,13 +209,11 @@
     selectedFlight.value = flight;
     selectedStatus.value = flight.status;
     isModalOpen.value = true;
-    note.value = flight.note;
 
-    if (flight.status === "rejected") {
-      formRejectedStatus.value.rejectionReason = flight.note;
-      formRejectedStatus.value.departureDate = flight.departure_date;
-      formRejectedStatus.value.price = flight.price;
-    }
+    formStatus.reason.value = flight.note;
+    formStatus.price.value = flight.price;
+    formStatus.departureDate.value = flight.departure_date;
+
   };
 
   // 🔹 Fermer la modale
@@ -267,27 +263,19 @@
     if (!selectedFlight.value) return;
 
     // Vérifier que si le statut est "rejected", la raison est renseignée
-    if (selectedStatus.value === "rejected" && !formRejectedStatus.value.rejectionReason) {
+    if (selectedStatus.value === "rejected" && !formStatus.value.reason) {
       errorMessage.value = "La raison du rejet est requise.";
       return;
     }
 
     // Construire le payload selon le statut choisi
-    let payload = {};
-    if (selectedStatus.value === "rejected") {
-      payload = {
-        newStatus: "rejected",
-        note: formRejectedStatus.value.rejectionReason,
-        departureDate: formRejectedStatus.value.departureDate,
-        price: formRejectedStatus.value.price,
-      };
-    } else {
-      payload = {
-        newStatus: selectedStatus.value,
-        note: note.value,
-      };
-    }
-
+    let payload = {
+      newStatus: "rejected",
+      note: formStatus.value.reason,
+      departureDate: formStatus.value.departureDate,
+      price: formStatus.value.price,
+    };
+    
     try {
       buttonLoading.value = true;
       const response = await axios.put(
@@ -324,7 +312,7 @@
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                await axios.delete(`/api/flights/${flight.id}`);
+                await axios.delete(`${AppDatas.baseUrl}/flights/${flight.id}`);
 
                 Swal.fire({
                     title: "Supprimé !",
@@ -368,22 +356,22 @@
 </script>
 
 <style scoped>
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
 
-th, td {
-  padding: 10px;
-  text-align: left;
-}
+  th, td {
+    padding: 10px;
+    text-align: left;
+  }
 
-th {
-  background-color: #f3f4f6;
-}
+  th {
+    background-color: #f3f4f6;
+  }
 
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 </style>

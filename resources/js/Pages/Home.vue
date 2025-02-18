@@ -1,8 +1,10 @@
 <template>
-    <div class="flex flex-col items-center py-10 bg-no-repeat bg-center bg-cover min-h-screen"
+    <div class="flex flex-col items-center bg-repeat bg-center bg-cover min-h-screen"
         style="background-image: url('../Assets/Images/background.jpg')">
-        <img :src="Logo" alt="Logo" class="h-32">
-        <router-link to="/dashboard">...</router-link>
+        <img :src="Logo" alt="Logo" class="h-36">
+        <p class="w-1/2 flex justify-center text-center italic font-bold">
+            Chaque Voyageur est unique et a sa propre vision du voyage. Que ce soit pour partir quelques heures de chez vous ou à l’autre bout du monde pour découvrir, visiter, rencontrer, vous émerveiller….
+        </p>
 
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-1 gap-6">

@@ -1,119 +1,86 @@
 <!DOCTYPE html>
-<html lang="fr">
-
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nouvelle réservation</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 600px;
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .header {
-            background-color: #007bff;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            border-radius: 10px 10px 0 0;
-        }
-
-        .content {
-            padding: 20px;
-            line-height: 1.6;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .highlight {
-            font-weight: bold;
-            color: #007bff;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmation de réservation de vol</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<body style="background-color: #f3f4f6; font-family: Arial, sans-serif; padding: 20px;">
+  <table align="center" width="100%" cellspacing="0" cellpadding="0">
+    <tr>
+      <td align="center">
+        <table width="600" style="background-color: #ffffff; padding: 20px; border-radius: 10px;">
+          <tr>
+            <td align="center" style="padding-bottom: 20px;">
+              <h2 style="color: #1e40af; font-size: 24px;">✈️ Nouvelle de réservation</h2>
+              <p style="color: #374151; font-size: 16px;">Bonjour <strong>[Nom du passager]</strong>,</p>
+              <p style="color: #4b5563;">Merci d'avoir réservé avec <strong>[Nom de la compagnie]</strong>.<br>Voici les détails de votre vol :</p>
+            </td>
+          </tr>
 
-<body>
-    <div class="container">
-        <div class="header">Nouvelle réservation reçue</div>
+          <tr>
+            <td style="padding: 20px; background-color: #eff6ff; border-radius: 8px;">
+              <table width="100%">
+                <tr>
+                  <td style="padding: 10px 0;"><strong>Numéro de réservation :</strong></td>
+                  <td style="padding: 10px 0; color: #1e40af;">[Numéro de réservation]</td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px 0;"><strong>Vol :</strong></td>
+                  <td style="padding: 10px 0;">[Numéro du vol]</td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px 0;"><strong>Départ :</strong></td>
+                  <td style="padding: 10px 0;">[Ville de départ] - [Aéroport] ([Code])</td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px 0;"><strong>Arrivée :</strong></td>
+                  <td style="padding: 10px 0;">[Ville d’arrivée] - [Aéroport] ([Code])</td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px 0;"><strong>Date & heure de départ :</strong></td>
+                  <td style="padding: 10px 0;">[Date - Heure locale]</td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px 0;"><strong>Date & heure d’arrivée :</strong></td>
+                  <td style="padding: 10px 0;">[Date - Heure locale]</td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px 0;"><strong>Classe :</strong></td>
+                  <td style="padding: 10px 0;">[Classe de voyage]</td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px 0;"><strong>Bagages :</strong></td>
+                  <td style="padding: 10px 0;">[Détails sur les bagages]</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-        <div class="content">
-            <p>Bonjour,</p>
-            <p>Une nouvelle réservation a été effectuée. Voici les détails :</p>
+          <tr>
+            <td style="padding: 20px;">
+              <h3 style="color: #1e40af; font-size: 18px;">📌 Informations importantes</h3>
+              <ul style="color: #4b5563; font-size: 14px; padding-left: 20px;">
+                <li><strong>Enregistrement :</strong> Disponible à partir de [Heure] en ligne via <a href="" style="color: #2563eb; text-decoration: none;">ce lien</a>.</li>
+                <li><strong>Documents de voyage :</strong> Assurez-vous d’avoir votre passeport et autres documents requis.</li>
+                <li><strong>Politique de bagages :</strong> Consultez les détails <a href="[Lien des bagages]" style="color: #2563eb; text-decoration: none;">ici</a>.</li>
+                <li><strong>Modification / Annulation :</strong> Gérez votre réservation <a href="[Lien de gestion]" style="color: #2563eb; text-decoration: none;">ici</a>.</li>
+              </ul>
+            </td>
+          </tr>
 
-            <h3>Informations du client :</h3>
-            <ul>
-                <li><span class="highlight">ID :</span> {{ $reservation->customer->id }}</li>
-                <li><span class="highlight">Nom :</span> {{ $reservation->customer->name }}</li>
-                <li><span class="highlight">Email :</span> {{ $reservation->customer->email }}</li>
-                <li><span class="highlight">Téléphone :</span> {{ $reservation->customer->phone }}</li>
-            </ul>
+          <tr>
+            <td align="center" style="padding-top: 20px;">
+              <p style="color: #4b5563;">Besoin d'aide ? Contactez-nous au <strong>[Numéro de contact]</strong>.</p>
+              <p style="font-size: 14px; color: #6b7280;">Nous vous souhaitons un excellent voyage !</p>
+              <p style="font-size: 14px; font-weight: bold; color: #1e40af;">[Nom de la compagnie aérienne]</p>
+            </td>
+          </tr>
 
-            <h3>Détails du vol :</h3>
-            <ul>
-                <li><span class="highlight">Type de vol :</span>
-                    @if ($reservation['flight_type'] === 'round_trip')
-                        Aller Retour
-                    @elseif ($reservation['flight_type'] === 'one_way')
-                        Aller Simple
-                    @else
-                        Multi Destination
-                    @endif
-                </li>
-                <li><span class="highlight">Origine :</span>
-                    {{ \App\Models\City::find($reservation['departure_city_id'])->name }}</li>
-                <li><span class="highlight">Destination :</span>
-                    {{ \App\Models\City::find($reservation['destination_city_id'])->name }}</li>
-
-                <li><span class="highlight">Date de départ :</span>
-                    {{ \Carbon\Carbon::parse($reservation['departure_date'])->format('d F Y') }}</li>
-
-                @if (!empty($reservation['return_date']))
-                    <li><span class="highlight">Date de retour :</span>
-                        {{ \Carbon\Carbon::parse($reservation['return_date'])->format('d F Y') }}</li>
-                @endif
-
-                <li><span class="highlight">Nombre de Passagers :</span> {{ $reservation['passengers'] }}</li>
-                <li><span class="highlight">Classe :</span>
-                    {{ ucfirst(str_replace('_', ' ', $reservation['flight_class'])) }}
-                    @if ($reservation['flight_class'] === 'economy')
-                        Economique
-                    @elseif ($reservation['flight_class'] === 'business')
-                        Affaires
-                    @else
-                        Première Classe
-                    @endif
-                </li>
-            </ul>
-
-            <a href="" class="text-indigo-600 underline">Se Connecter</a>
-
-            <p>
-                Merci de vérifier et traiter cette réservation dans les plus brefs délais.
-            </p>
-
-        </div>
-
-        <div class="footer">
-            <p>Cet email est généré automatiquement par {{ config('app.name') }}.</p>
-        </div>
-    </div>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
-
 </html>
