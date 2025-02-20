@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Confirmation de réservation de vol</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body style="background-color: #f3f4f6; font-family: Arial, sans-serif; padding: 20px;">

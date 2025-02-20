@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="text-2xl font-bold mb-4">✈️🏨 Liste des (Vols + Hotels) Réservés</h1>
+    <h1 class="text-2xl font-bold mb-4">✈️🏨 Liste des réservations de vols + hotels</h1>
 
     <div class="bg-white p-4 rounded-lg shadow-md">
       <!-- Barre de recherche -->
@@ -28,6 +28,9 @@
           </tr>
         </thead>
         <tbody>
+          <tr v-if="props.flighthotels.length === 0">
+            <td colspan="7" class="text-center text-red-400 p-3">Aucun vol + hotel enregistré...</td>
+          </tr>
           <tr v-for="(flighthotel, index) in filteredFlights" :key="flighthotel.id" class="border-b">
             <td class="p-3">{{ index + 1 }}</td>
             <td class="p-3">{{ flighthotel.customer.name }}</td>
@@ -55,7 +58,7 @@
             </td>
             <td class="p-3 flex space-x-2">
               <router-link
-                :to="`/bookings/flighthotel/${flighthotel.id}`"
+                :to="`/dashboard/bookings/flighthotel/${flighthotel.id}`"
                 class="bg-indigo-600 text-white px-1 py-1 rounded-lg text-sm hover:bg-indigo-700"
               >
                 <Eye class="w-4 h-4" />
@@ -76,8 +79,8 @@
         <button @click="prevPage" :disabled="currentPage === 1" class="px-4 py-2 bg-gray-300 rounded-lg">
           Précédent
         </button>
-        <span>Page {{ currentPage }} / {{ totalPages }}</span>
-        <button @click="nextPage" :disabled="currentPage === totalPages" class="px-4 py-2 bg-gray-300 rounded-lg">
+        <span v-if="totalPages > 0">Page {{ currentPage }} / {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="currentPage === totalPages || totalPages === 0" class="px-4 py-2 bg-gray-300 rounded-lg">
           Suivant
         </button>
       </div>
@@ -96,18 +99,18 @@
         <form @submit.prevent="updateStatus" v-if="selectedStatus === 'rejected'" class="mt-4">
           <div class="py-2">
             <label for="reason" class="block mb-2">Raison du rejet :</label>
-            <textarea v-model="formRejectedStatus.rejectionReason" id="reason" placeholder="Nous avons pas pu trouver un vol pour la date demandé mais ..." class="w-full border p-2 rounded-lg"></textarea>
+            <textarea v-model="formStatus.reason" id="reason" placeholder="Nous avons pas pu trouver un vol pour la date demandé mais ..." class="w-full border p-2 rounded-lg"></textarea>
           </div>
           <div class="py-2">
             <label for="departure_date">Date de départ</label>
-            <input type="date" v-model="formRejectedStatus.departureDate" class="w-full border p-2 rounded-lg" />
+            <input type="date" v-model="formStatus.departureDate" class="w-full border p-2 rounded-lg" />
           </div>
           <div class="py-2">
             <label for="price">Prix</label>
-            <input type="number" v-model="formRejectedStatus.price" class="w-full border p-2 rounded-lg" />
+            <input type="number" v-model="formStatus.price" class="w-full border p-2 rounded-lg" />
           </div>
           <div class="flex justify-end mt-4">
-            <button @click="closeModal" class="px-4 py-2 bg-gray-300 rounded-lg mr-2">Annuler</button>
+            <button @click="closeModalFlight" class="px-4 py-2 bg-gray-300 rounded-lg mr-2">Annuler</button>
             <button type="submit" :disabled="buttonLoading" class="px-4 py-2 min-w-28 bg-blue-600 text-white rounded-lg">
               <span v-if="!buttonLoading">Enregistrer</span>
               <div v-else class="flex items-center">
@@ -121,6 +124,10 @@
           </div>
         </form>
         <form @submit.prevent="updateStatus" v-else>
+          <div class="py-2" v-if="selectedStatus === 'approved'">
+            <label for="price">Prix</label>
+            <input type="number" v-model="formStatus.price" class="w-full border p-2 rounded-lg" />
+          </div>
           <div class="my-2" v-if="!takeNote">
             <button
               type="button"
@@ -139,14 +146,14 @@
               <textarea
                 id="note"
                 name="note"
-                v-model="note"
+                v-model="formStatus.reason"
                 class="w-full border p-2 rounded-lg"
                 placeholder="Saisissez votre note ici..."
               ></textarea>
             </div>
           </div>
           <div class="flex justify-end mt-4">
-            <button @click="closeModal" type="button" class="px-4 py-2 bg-gray-300 rounded-lg mr-2">
+            <button @click="closeModalFlight" type="button" class="px-4 py-2 bg-gray-300 rounded-lg mr-2">
               Annuler
             </button>
             <button type="submit" :disabled="buttonLoading" class="px-4 py-2 min-w-28 bg-blue-600 text-white rounded-lg">
@@ -161,8 +168,6 @@
             </button>
           </div>
         </form>
-
-
       </div>
     </div>
   </div>
@@ -192,14 +197,14 @@
   const isModalOpen = ref(false);
   const selectedFlightHotel = ref(null);
   const selectedStatus = ref("");
-  const note = ref("");
   const buttonLoading = ref(false);
 
-  const formRejectedStatus = ref({
-    newStatus: "rejected",
-    rejectionReason: "",
+
+  const formStatus = ref({
+    newStatus: "",
+    reason: "",
     departureDate: "",
-    price: "",
+    price: 0,
   });
 
   // 🔹 Ouvrir la modale avec les infos du vol sélectionné
@@ -207,13 +212,10 @@
     selectedFlightHotel.value = flighthotel;
     selectedStatus.value = flighthotel.status;
     isModalOpen.value = true;
-    note.value = flighthotel.note;
 
-    if (flighthotel.status === "rejected") {
-      formRejectedStatus.value.rejectionReason = flighthotel.note;
-      formRejectedStatus.value.departureDate = flighthotel.departure_date;
-      formRejectedStatus.value.price = flighthotel.price;
-    }
+    formStatus.value.reason = flighthotel.note;
+    formStatus.value.price = flighthotel.price;
+    formStatus.value.departureDate = flighthotel.departure_date;
   };
 
   // 🔹 Fermer la modale
@@ -233,7 +235,7 @@
           flighthotel.customer?.name?.toLowerCase().includes(searchTerm) ||
           flighthotel.origin.name.toLowerCase().includes(searchTerm) ||
           flighthotel.destination.name.toLowerCase().includes(searchTerm) ||
-          flighthotel.flighthotel_class.toLowerCase().includes(searchTerm) ||
+          flighthotel.flight_class.toLowerCase().includes(searchTerm) ||
           flighthotel.status.toLowerCase().includes(searchTerm)
         );
       })
@@ -263,34 +265,25 @@
     if (!selectedFlightHotel.value) return;
 
     // Vérifier que si le statut est "rejected", la raison est renseignée
-    if (selectedStatus.value === "rejected" && !formRejectedStatus.value.rejectionReason) {
+    if (selectedStatus.value === "rejected" && !formStatus.value.reason) {
       errorMessage.value = "La raison du rejet est requise.";
       return;
     }
 
     // Construire le payload selon le statut choisi
-    let payload = {};
-    if (selectedStatus.value === "rejected") {
-      payload = {
-        newStatus: "rejected",
-        note: formRejectedStatus.value.rejectionReason,
-        departureDate: formRejectedStatus.value.departureDate,
-        price: formRejectedStatus.value.price,
-      };
-    } else {
-      payload = {
-        newStatus: selectedStatus.value,
-        note: note.value,
-      };
-    }
-
+    let payload = {
+      newStatus: selectedStatus.value,
+      note: formStatus.value.reason,
+      departureDate: formStatus.value.departureDate,
+      price: formStatus.value.price,
+    };
+    
     try {
       buttonLoading.value = true;
       const response = await axios.put(
         `${AppDatas.baseUrl}/flight-hotel/${selectedFlightHotel.value.id}/status`,
         payload
       );
-      console.log(response.data);
       
       // Mettre à jour localement le statut du vol
       selectedFlightHotel.value.status = selectedStatus.value;

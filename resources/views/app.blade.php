@@ -14,5 +14,10 @@
     </head>
     <body>
         <div id="app"></div>
+        <script>
+            window.Laravel = {
+                baseUrl: @json(env('VITE_APP_URL'))
+            };
+        </script>
     </body>
 </html>

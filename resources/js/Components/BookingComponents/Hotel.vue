@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="text-2xl font-bold mb-4">🏨 Réservations d'Hôtel</h1>
+    <h1 class="text-2xl font-bold mb-4">🏨 Liste des réservations d'hotel</h1>
 
     <div class="bg-white p-4 rounded-lg shadow-md">
       <!-- Barre de recherche -->
@@ -27,12 +27,16 @@
           </tr>
         </thead>
         <tbody>
+          <tr v-if="props.hotels.length === 0">
+            <td colspan="7" class="text-center text-red-400 p-3">Aucun vol enregistré...</td>
+          </tr>
+
           <tr v-for="(hotel, index) in filteredhotels" :key="hotel.id" class="border-b">
             <td class="p-3">{{ index + 1 }}</td>
             <td class="p-3 max-w-24">{{ hotel.customer.name }}</td>
             <td class="p-3">{{ hotel.country.name }}</td>
             <td class="p-3">
-              {{ formatDate(hotel.arrival_date) }} <br> {{ formatDate(hotel.return_date) }}
+              {{ formatDate(hotel.arrival_date) }} <br> au <br> {{ formatDate(hotel.return_date) }}
             </td>
             <td class="p-3">
               {{ hotel.number_of_room }}
@@ -53,7 +57,7 @@
             </td>
             <td class="p-3 flex space-x-2">
               <router-link
-                :to="`/bookings/hotel/${hotel.id}`"
+                :to="`/dashboard/bookings/hotel/${hotel.id}`"
                 class="bg-indigo-600 text-white px-1 py-1 rounded-lg text-sm hover:bg-indigo-700"
               >
                 <Eye class="w-4 h-4" />
@@ -74,8 +78,8 @@
         <button @click="prevPage" :disabled="currentPage === 1" class="px-4 py-2 bg-gray-300 rounded-lg">
           Précédent
         </button>
-        <span>Page {{ currentPage }} / {{ totalPages }}</span>
-        <button @click="nextPage" :disabled="currentPage === totalPages" class="px-4 py-2 bg-gray-300 rounded-lg">
+        <span v-if="totalPages > 0">Page {{ currentPage }} / {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="currentPage === totalPages || totalPages === 0" class="px-4 py-2 bg-gray-300 rounded-lg">
           Suivant
         </button>
       </div>
@@ -94,15 +98,15 @@
         <form @submit.prevent="updateStatus" v-if="selectedStatus === 'rejected'" class="mt-4">
           <div class="py-2">
             <label for="reason" class="block mb-2">Raison du rejet :</label>
-            <textarea v-model="formRejectedStatus.rejectionReason" id="reason" placeholder="Nous avons pas pu trouver un hotel pour la date demandé mais ..." class="w-full border p-2 rounded-lg"></textarea>
+            <textarea v-model="formStatus.reason" id="reason" placeholder="Nous avons pas pu trouver un vol pour la date demandé mais ..." class="w-full border p-2 rounded-lg"></textarea>
           </div>
           <div class="py-2">
-            <label for="arrival_date">Date d'arrivée</label>
-            <input type="date" v-model="formRejectedStatus.arrivalDate" class="w-full border p-2 rounded-lg" />
+            <label for="departure_date">Date de départ</label>
+            <input type="date" v-model="formStatus.arrivalDate" class="w-full border p-2 rounded-lg" />
           </div>
           <div class="py-2">
             <label for="price">Prix</label>
-            <input type="number" v-model="formRejectedStatus.price" class="w-full border p-2 rounded-lg" />
+            <input type="number" v-model="formStatus.price" class="w-full border p-2 rounded-lg" />
           </div>
           <div class="flex justify-end mt-4">
             <button @click="closeModal" class="px-4 py-2 bg-gray-300 rounded-lg mr-2">Annuler</button>
@@ -119,6 +123,10 @@
           </div>
         </form>
         <form @submit.prevent="updateStatus" v-else>
+          <div class="py-2" v-if="selectedStatus === 'approved'">
+            <label for="price">Prix</label>
+            <input type="number" v-model="formStatus.price" class="w-full border p-2 rounded-lg" />
+          </div>
           <div class="my-2" v-if="!takeNote">
             <button
               type="button"
@@ -137,7 +145,7 @@
               <textarea
                 id="note"
                 name="note"
-                v-model="note"
+                v-model="formStatus.reason"
                 class="w-full border p-2 rounded-lg"
                 placeholder="Saisissez votre note ici..."
               ></textarea>
@@ -159,8 +167,6 @@
             </button>
           </div>
         </form>
-
-
       </div>
     </div>
   </div>
@@ -190,14 +196,13 @@
   const isModalOpen = ref(false);
   const selectedhotel = ref(null);
   const selectedStatus = ref("");
-  const note = ref("");
   const buttonLoading = ref(false);
 
-  const formRejectedStatus = ref({
+  const formStatus = ref({
     newStatus: "rejected",
-    rejectionReason: "",
+    reason: "",
     arrivalDate: "",
-    price: "",
+    price: 1,
   });
 
   // 🔹 Ouvrir la modale avec les infos du hotel sélectionné
@@ -205,13 +210,10 @@
     selectedhotel.value = hotel;
     selectedStatus.value = hotel.status;
     isModalOpen.value = true;
-    note.value = hotel.note;
 
-    if (hotel.status === "rejected") {
-      formRejectedStatus.value.rejectionReason = hotel.note;
-      formRejectedStatus.value.arrivalDate = hotel.departure_date;
-      formRejectedStatus.value.price = hotel.price;
-    }
+    formStatus.value.reason = hotel.note;
+    formStatus.value.price = hotel.price;
+    formStatus.value.arrivalDate = hotel.arrival_date;
   };
 
   // 🔹 Fermer la modale
@@ -229,9 +231,7 @@
       .filter(hotel => {
         return (
           hotel.customer?.name?.toLowerCase().includes(searchTerm) ||
-          hotel.origin.name.toLowerCase().includes(searchTerm) ||
-          hotel.destination.name.toLowerCase().includes(searchTerm) ||
-          hotel.hotel_class.toLowerCase().includes(searchTerm) ||
+          hotel.country.name.toLowerCase().includes(searchTerm) ||
           hotel.status.toLowerCase().includes(searchTerm)
         );
       })
@@ -256,32 +256,25 @@
     if (currentPage.value > 1) currentPage.value--;
   };
 
-  //Changement de statut
+  
   const updateStatus = async () => {
     if (!selectedhotel.value) return;
 
     // Vérifier que si le statut est "rejected", la raison est renseignée
-    if (selectedStatus.value === "rejected" && !formRejectedStatus.value.rejectionReason) {
+    if (selectedStatus.value === "rejected" && !formStatus.value.reason) {
       errorMessage.value = "La raison du rejet est requise.";
       return;
     }
 
     // Construire le payload selon le statut choisi
-    let payload = {};
-    if (selectedStatus.value === "rejected") {
-      payload = {
-        newStatus: "rejected",
-        note: formRejectedStatus.value.rejectionReason,
-        arrivalDate: formRejectedStatus.value.arrivalDate,
-        price: formRejectedStatus.value.price,
-      };
-    } else {
-      payload = {
-        newStatus: selectedStatus.value,
-        note: note.value,
-      };
-    }
-
+    let payload = {
+      newStatus: selectedStatus.value,
+      note: formStatus.value.reason,
+      arrivalDate: formStatus.value.arrivalDate,
+      price: formStatus.value.price,
+    };
+    console.log(payload.price)
+    
     try {
       buttonLoading.value = true;
       const response = await axios.put(
@@ -290,10 +283,9 @@
       );
       console.log(response.data);
       
-      // Mettre à jour localement le statut du hotel
+      // Mettre à jour localement le statut de l'hotel
       selectedhotel.value.status = selectedStatus.value;
       
-      // Fermer la modale après la mise à jour
       closeModal();
     } catch (error) {
       console.error("Erreur lors de la mise à jour du statut", error);
@@ -304,7 +296,7 @@
     }
   };
 
-  // ⚡ Fonction pour supprimer un hotel
+  
   const confirmDelete = async (hotel) => {
     Swal.fire({
         title: "Êtes-vous sûr ?",
@@ -318,7 +310,7 @@
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                await axios.delete(`${AppDatas.baseUrl}/hotel/${hotel.id}`);
+                await axios.delete(`${AppDatas.baseUrl}/hotels/${hotel.id}`);
 
                 Swal.fire({
                     title: "Supprimé !",

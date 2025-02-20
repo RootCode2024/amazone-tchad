@@ -10,6 +10,7 @@ use App\Models\FlightHotel;
 use App\Models\Hotel;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -36,14 +37,44 @@ class ManagerController extends Controller
         return response()->json($user);
     }
 
+    public function update(Request $request)
+    {
+        $request->validate([
+            'id' => 'required',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $request->id,
+            'address' => 'nullable|string',
+        ]);
+
+        $user = User::find($request->id);
+
+        if (!$user) {
+            return response()->json(['message' => 'Aucun manager trouvé.'], 404);
+        }
+
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'address' => $request->address,
+        ]);
+
+        return response()->json(['message' => 'Information mise à jour avec succès !']);
+    }
+
+
     public function updatePassword(Request $request)
     {
         $request->validate([
+            'id' => 'required',
             'current_password' => 'required',
             'new_password' => 'required|min:6|confirmed',
         ]);
 
-        $user = $request->user();
+        $user = User::find($request->id);
+
+        if (!$user) {
+            return response()->json(['message' => 'Aucun manager trouvé.'], 404);
+        }
 
         if (!Hash::check($request->current_password, $user->password)) {
             return response()->json(['error' => 'Le mot de passe actuel est incorrect.'], 400);
@@ -120,7 +151,7 @@ class ManagerController extends Controller
             
             $reservations = $flights + $hotels + $flighthotels + $carlocations;
             $customers = Customer::count();
-            $managers = User::where('role', '!=', 'admin')->count();
+            $managers = User::count();
             
             return response()->json(['reservations' => $reservations, 'customers' => $customers, 'managers' => $managers]);
         } catch (\Exception $e) {

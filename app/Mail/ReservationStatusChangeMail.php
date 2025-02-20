@@ -15,6 +15,7 @@ class ReservationStatusChangeMail extends Mailable
 
     public $reservation;
     public $type;
+    public $template;
 
     /**
      * Create a new message instance.
@@ -23,6 +24,8 @@ class ReservationStatusChangeMail extends Mailable
     {
         $this->reservation = $reservation;
         $this->type = $type;
+
+       $this->template = $reservation->status;
     }
 
     /**
@@ -41,7 +44,7 @@ class ReservationStatusChangeMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mail.StatusChange',
+            view: 'mail.status.' . $this->template,
             with: ['reservation' => $this->reservation, 'type' => $this->type],
         );
     }

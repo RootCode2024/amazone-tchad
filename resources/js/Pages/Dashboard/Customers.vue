@@ -1,7 +1,6 @@
 <template>
-  <Layout>
-    <div class="p-6 max-w-6xl mx-auto">
-    <h2 class="text-lg font-semibold mb-4">Liste des clients</h2>
+  <div class="p-6 max-w-6xl mx-auto">
+    <h2 class="text-2xl font-bold mb-4">Liste des clients</h2>
 
     <!-- Barre de recherche -->
     <input
@@ -24,6 +23,10 @@
           </tr>
         </thead>
         <tbody>
+          <tr v-if="customers.length === 0">
+            <td colspan="7" class="text-center text-red-400 p-3">Aucun client enregistré ...</td>
+          </tr>
+
           <tr v-for="customer in paginatedCustomers" :key="customer.id" class="border-t">
             <td class="px-4 py-2">{{ customer.id }}</td>
             <td class="px-4 py-2">{{ customer.name }}</td>
@@ -31,7 +34,7 @@
             <td class="px-4 py-2">{{ customer.phone }}</td>
             <td class="flex px-4 py-2 space-x-3">
               <router-link
-                :to="`/customers/${customer.id}`"
+                :to="`/dashboard/customers/${customer.id}`"
                 class="bg-indigo-600 text-white px-1 py-1 rounded-lg text-sm hover:bg-indigo-700"
               >
                 <Eye class="w-4 h-4" />
@@ -49,24 +52,22 @@
     </div>
 
     <!-- Pagination -->
-    <div class="flex justify-between items-center mt-4">
-      <button @click="prevPage" :disabled="currentPage === 1" class="px-4 py-2 bg-gray-300 rounded">
+    <div class="flex justify-between mt-4">
+      <button @click="prevPage" :disabled="currentPage === 1" class="px-4 py-2 bg-gray-300 rounded-lg">
         Précédent
       </button>
-      <span>Page {{ currentPage }} / {{ totalPages }}</span>
-      <button @click="nextPage" :disabled="currentPage >= totalPages" class="px-4 py-2 bg-gray-300 rounded">
+      <span v-if="totalPages > 0">Page {{ currentPage }} / {{ totalPages }}</span>
+      <button @click="nextPage" :disabled="currentPage === totalPages || totalPages === 0" class="px-4 py-2 bg-gray-300 rounded-lg">
         Suivant
       </button>
     </div>
   </div>
-  </Layout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import AppDatas from "../../Services/app.js";
-import Layout from "../../Layouts/AppLayout.vue";
 import { Eye, Trash } from "lucide-vue-next";
 import Swal from "sweetalert2";
 
@@ -97,7 +98,7 @@ const filteredCustomers = computed(() => {
   return customers.value.filter((customer) =>
     customer.name.toLowerCase().includes(search.value.toLowerCase()) ||
     customer.email.toLowerCase().includes(search.value.toLowerCase()) ||
-    customer.phone.toLowerCase().includes(search.value.toLowerCase()) 
+    customer.phone.toLowerCase().includes(search.value) 
   );
 });
 
@@ -180,5 +181,9 @@ th {
 }
 th:hover {
   background-color: #f3f4f6;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>

@@ -14,7 +14,7 @@
           <tr>
             <td align="center" style="padding-bottom: 20px;">
               <h2 style="color: #16a34a; font-size: 24px;">✅ Félicitations ! Votre demande est approuvée</h2>
-              <p style="color: #374151; font-size: 16px;">Bonjour <strong>[Nom du destinataire]</strong>,</p>
+              <p style="color: #374151; font-size: 16px;">Bonjour <strong>{{ $reservation->customer->name }}</strong>,</p>
               <p style="color: #4b5563;">Nous sommes heureux de vous informer que le statut de votre demande a changé.</p>
             </td>
           </tr>
@@ -25,7 +25,7 @@
               <table width="100%">
                 <tr>
                   <td style="padding: 10px 0;"><strong>Numéro de la demande :</strong></td>
-                  <td style="padding: 10px 0; color: #16a34a;">[Numéro de la demande]</td>
+                  <td style="padding: 10px 0; color: #16a34a;">{{ $type }}{{ $reservation->id }}</td>
                 </tr>
                 <tr>
                   <td style="padding: 10px 0;"><strong>Statut précédent :</strong></td>
@@ -43,24 +43,20 @@
           <tr>
             <td style="padding: 20px;">
               <p style="color: #4b5563; font-size: 14px;">Votre demande a été examinée et nous avons le plaisir de vous annoncer qu'elle a été approuvée ! 🎉</p>
-              <p style="color: #16a34a; font-size: 16px; font-weight: bold;">[Détails supplémentaires sur l'approbation]</p>
-              <p style="color: #4b5563; font-size: 14px;">Vous pouvez maintenant accéder à votre compte et profiter des services associés.</p>
-            </td>
-          </tr>
-
-          <!-- Bouton d'action -->
-          <tr>
-            <td align="center" style="padding-top: 20px;">
-              <a href="[Lien de connexion]" style="background-color: #16a34a; color: #ffffff; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-size: 16px; display: inline-block;">Accéder à mon compte</a>
+              <p style="color: #b91c1c; font-size: 16px; font-weight: bold;">{{ $reservation->note }}</p><p class="text-blue-600 text-lg font-thin">
+                Date de départ trouvée : {{ \Carbon\Carbon::parse($reservation->departure_date)->format('d F Y') }}
+              </p>            
+              <p style="color: blue; font-size: 16px; font-weight: bold;">Prix : {{ number_format($reservation->price, 0, ',', ' ') }} F CFA</p>
+              <p style="color: #4b5563; font-size: 14px;">Nous vous recontacterons sous peu finaliser les details.</p>
             </td>
           </tr>
 
           <!-- Footer -->
           <tr>
             <td align="center" style="padding-top: 20px;">
-              <p style="color: #4b5563; font-size: 14px;">Besoin d'aide ? Contactez-nous au <strong>[Numéro de contact]</strong>.</p>
+              <p style="color: #4b5563; font-size: 14px;">Besoin d'aide ? Contactez-nous au <strong>{{ env("APP_PHONE") }}</strong>.</p>
               <p style="font-size: 14px; color: #6b7280;">Merci pour votre confiance !</p>
-              <p style="font-size: 14px; font-weight: bold; color: #1e40af;">[Nom de l'entreprise]</p>
+              <p style="font-size: 14px; font-weight: bold; color: #1e40af;">{{ env("APP_NAME") }}</p>
             </td>
           </tr>
 

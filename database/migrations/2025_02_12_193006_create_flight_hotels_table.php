@@ -24,6 +24,8 @@ return new class extends Migration
             $table->integer('passengers');
             $table->enum('flight_class', ['economy', 'first_class', 'business'])->default('economy');
             $table->unsignedInteger('number_of_room');
+            $table->text('note')->nullable();
+            $table->unsignedBigInteger('price')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
         });

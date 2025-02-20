@@ -1,9 +1,5 @@
 <template>
-  <div v-if="loading">
-    <Loader />
-  </div>
-  <div v-else>
-    <Layout>
+  <div>
       <!-- Message de bienvenue -->
       <div class="mb-6 p-6 bg-blue-600 text-white rounded-lg shadow-md">
         <h1 class="text-3xl font-bold">👋 Heureux de vous revoir, <span class="italic">Admin</span> !</h1>
@@ -12,44 +8,40 @@
 
       <!-- Statistiques principales -->
       <div class="grid grid-cols-1 gap-6 mb-6 lg:grid-cols-3">
-                <div class="w-full px-4 py-5 bg-white rounded-lg shadow">
-                    <div class="text-sm font-medium text-gray-500 truncate">
-                        Total Réservations
-                    </div>
-                    <div class="mt-1 text-3xl font-semibold text-gray-900">
-                        {{ stats.reservations }}
-                    </div>
-                </div>
-                <div class="w-full px-4 py-5 bg-white rounded-lg shadow">
-                    <div class="text-sm font-medium text-gray-500 truncate">
-                        Total Clients
-                    </div>
-                    <div class="mt-1 text-3xl font-semibold text-gray-900">
-                        {{ stats.customers }}
-                    </div>
-                </div>
-                <div class="w-full px-4 py-5 bg-white rounded-lg shadow">
-                    <div class="text-sm font-medium text-gray-500 truncate">
-                        Total Manager
-                    </div>
-                    <div class="mt-1 text-3xl font-semibold text-gray-900">
-                        {{ stats.managers }}
-                    </div>
-                </div>
-            </div>
-
-    </Layout>
+          <div class="w-full px-4 py-5 bg-white rounded-lg shadow-xl">
+              <div class="text-sm font-medium text-gray-500 truncate">
+                  Réservations
+              </div>
+              <div class="mt-1 text-3xl font-semibold text-gray-900">
+                  <!-- Vérification si stats est défini avant d'y accéder -->
+                  {{ stats?.reservations || 0 }}
+              </div>
+          </div>
+          <div class="w-full px-4 py-5 bg-white rounded-lg shadow-xl">
+              <div class="text-sm font-medium text-gray-500 truncate">
+                  Clients
+              </div>
+              <div class="mt-1 text-3xl font-semibold text-gray-900">
+                  {{ stats?.customers || 0 }}
+              </div>
+          </div>
+          <div class="w-full px-4 py-5 bg-white rounded-lg shadow-xl">
+              <div class="text-sm font-medium text-gray-500 truncate">
+                  Managers
+              </div>
+              <div class="mt-1 text-3xl font-semibold text-gray-900">
+                  {{ stats?.managers || 0 }}
+              </div>
+          </div>
+      </div>
   </div>
 </template>
 
 <script setup>
-import Layout from '../../Layouts/AppLayout.vue';
 import { ref, onMounted } from 'vue';
-import Loader from '../../Components/Loader.vue';
 import { PlaneTakeoff, Hotel, Car, ListChecks, Plus, BarChartBig } from 'lucide-vue-next';
 import axios from 'axios';
 import AppDatas from '../../Services/app.js'
-
 
 const motivationMessages = [
   "Chaque réservation est une nouvelle aventure en route ! 🚀",
@@ -60,18 +52,19 @@ const motivationMessages = [
 
 const motivationMessage = ref(motivationMessages[Math.floor(Math.random() * motivationMessages.length)]);
 
-const stats = ref(null);
-const loading = ref(true);
+// Initialisation de stats avec un objet vide au lieu de null
+const stats = ref({
+  reservations: 0,
+  customers: 0,
+  managers: 0
+});
 
 const fetchDatas = async () => {
   try {
     const response = await axios.get(`${AppDatas.baseUrl}/dashboard`);
     stats.value = response.data;
-    console.log(stats.value);
   } catch (error) {
     console.error("Erreur lors de la récupération des données :", error);
-  } finally {
-    loading.value = false;
   }
 };
 

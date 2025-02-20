@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="text-2xl font-bold mb-4">✈️ Liste des Vols Réservés</h1>
+    <h1 class="text-2xl font-bold mb-4">✈️ Liste des réservations de vols</h1>
 
     <div class="bg-white p-4 rounded-lg shadow-md">
       <!-- Barre de recherche -->
@@ -28,6 +28,10 @@
           </tr>
         </thead>
         <tbody>
+          <tr v-if="props.flights.length === 0">
+            <td colspan="7" class="text-center text-red-400 p-3">Aucun vol enregistré...</td>
+          </tr>
+          
           <tr v-for="(flight, index) in filteredFlights" :key="flight.id" class="border-b">
             <td class="p-3">{{ index + 1 }}</td>
             <td class="p-3">{{ flight.customer.name }}</td>
@@ -50,12 +54,11 @@
                 }"
                 v-text="(flight.status === 'pending') ? 'En attente' : (flight.status === 'approved') ? 'Validé' : 'Rejeté'"
               >
-
               </span>
             </td>
             <td class="p-3 flex space-x-2">
               <router-link
-                :to="`/bookings/flight/${flight.id}`"
+                :to="`/dashboard/bookings/flight/${flight.id}`"
                 class="bg-indigo-600 text-white px-1 py-1 rounded-lg text-sm hover:bg-indigo-700"
               >
                 <Eye class="w-4 h-4" />
@@ -76,8 +79,8 @@
         <button @click="prevPage" :disabled="currentPage === 1" class="px-4 py-2 bg-gray-300 rounded-lg">
           Précédent
         </button>
-        <span>Page {{ currentPage }} / {{ totalPages }}</span>
-        <button @click="nextPage" :disabled="currentPage === totalPages" class="px-4 py-2 bg-gray-300 rounded-lg">
+        <span v-if="totalPages > 0">Page {{ currentPage }} / {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="currentPage === totalPages || totalPages === 0" class="px-4 py-2 bg-gray-300 rounded-lg">
           Suivant
         </button>
       </div>
@@ -201,18 +204,19 @@
     newStatus: "",
     reason: "",
     departureDate: "",
-    price: "",
+    price: 0,
   });
 
   // 🔹 Ouvrir la modale avec les infos du vol sélectionné
   const openStatusModal = (flight) => {
+
     selectedFlight.value = flight;
     selectedStatus.value = flight.status;
     isModalOpen.value = true;
 
-    formStatus.reason.value = flight.note;
-    formStatus.price.value = flight.price;
-    formStatus.departureDate.value = flight.departure_date;
+    formStatus.value.reason = flight.note;
+    formStatus.value.price = flight.price;
+    formStatus.value.departureDate = flight.departure_date;
 
   };
 
@@ -258,7 +262,7 @@
     if (currentPage.value > 1) currentPage.value--;
   };
 
-  //Changement de statut
+  
   const updateStatus = async () => {
     if (!selectedFlight.value) return;
 
@@ -270,7 +274,7 @@
 
     // Construire le payload selon le statut choisi
     let payload = {
-      newStatus: "rejected",
+      newStatus: selectedStatus.value,
       note: formStatus.value.reason,
       departureDate: formStatus.value.departureDate,
       price: formStatus.value.price,
@@ -298,7 +302,7 @@
     }
   };
 
-  // ⚡ Fonction pour supprimer un vol
+  
   const confirmDelete = async (flight) => {
     Swal.fire({
         title: "Êtes-vous sûr ?",

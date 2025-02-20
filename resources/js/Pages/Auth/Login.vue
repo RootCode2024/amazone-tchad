@@ -21,7 +21,7 @@
           <input type="checkbox" v-model="rememberMe" class="form-checkbox text-blue-600" />
           <span class="ml-2 text-gray-600">Se souvenir de moi</span>
         </label>
-        <a href="#" class="text-blue-600 font-semibold text-sm">Mot de passe oublié ?</a>
+        <router-link to="/forgot_password" class="text-blue-600 font-semibold text-sm">Mot de passe oublié ?</router-link>
       </div>
 
       <p v-if="errorMessage" class="text-red-500 text-sm mt-2">{{ errorMessage }}</p>

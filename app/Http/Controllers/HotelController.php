@@ -64,30 +64,26 @@ class HotelController extends Controller
             'newStatus' => 'required|string|in:pending,approved,rejected',
             'note' => 'nullable|string',
             'arrivalDate' => 'required_if:newStatus,rejected|date',
-            'price' => 'required_if:newStatus,rejected|numeric',
+            'price' => 'nullable',
         ]);
 
         $hotel = Hotel::findOrFail($id);
 
         if (!$hotel) {
-            return response()->json(['error' => 'Reservation hotel non trouvé'], 404);
+            return response()->json(['error' => 'Hotel non trouvé'], 404);
         }
 
-        if ($request->newStatus === 'rejected')
-        {
-            $hotel->note = $request->note;
-            $hotel->arrival_date = $request->arrivalDate;
-            $hotel->price = $request->price;
-        }
-
+        $hotel->note = $request->note;
+        $hotel->arrival_date = $request->arrivalDate;
+        $hotel->price = $request->price;
         $hotel->status = $request->newStatus;
 
         $hotel->save();
 
         // Envoi d'un e-mail au client
-        Mail::to($hotel->customer->email)->send(new ReservationStatusChangeMail($hotel, 'VOL'));
+        Mail::to($hotel->customer->email)->send(new ReservationStatusChangeMail($hotel, 'HOTEL'));
 
-        return response()->json(['message' => 'Statut du vol mis à jour']);
+        return response()->json(['message' => 'Statut de l\'hotel mis à jour']);
     }
 
     public function show($id)

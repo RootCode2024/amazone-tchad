@@ -32,7 +32,8 @@ class AuthController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'verification_token' => Str::random(60), // Vérifier que cette colonne existe dans la table users
+                'verification_token' => Str::random(60),
+                'role' => 'manager'
             ]);
     
             
@@ -41,7 +42,7 @@ class AuthController extends Controller
             Mail::to($user->email)->send(new RegisterSendVerificationMail($user, $verificationUrl));
     
             // Création du token d'API
-            $token = $user->createToken('YourAppName')->plainTextToken;
+            $token = $user->createToken('AMAZONETCHAD')->plainTextToken;
     
             return response()->json([
                 'message' => 'Utilisateur créé avec succès. Vérifiez votre email.',
@@ -85,16 +86,20 @@ class AuthController extends Controller
 
     public function user(Request $request)
     {
-        return response()->json($request->user());
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Utilisateur non authentifié'], 401);
+        }
+
+        return response()->json($user);
     }
 
     public function verifyEmail($token)
     {
-        // Recherche de l'utilisateur avec le token
         $user = User::where('verification_token', $token)->first();
     
         if ($user) {
-            // Marquer l'email comme vérifié et supprimer le token
             $user->email_verified_at = now();
             $user->verification_token = null;
             $user->save();

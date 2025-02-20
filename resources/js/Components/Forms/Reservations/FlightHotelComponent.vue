@@ -148,20 +148,20 @@ const formErrors = ref({
     phone: { error: false, message: "Veuillez saisir un numéro de téléphone valide." }
 });
 
-// Changer de step
+
 const changeStep = (newStep) => {
     if (newStep === 2) {
         if (!form.value.departure_date) {
             formErrors.value.departure_date.error = true;
-            showError(formErrors.value.departure_date.message);
+            toastFunction('error', formErrors.value.departure_date.message);
             step.value = 1;
             return;
         }
         
         if (form.value.flight_type !== "one_way" && !form.value.return_date) {
             formErrors.value.return_date.error = true;
-            showError(formErrors.value.return_date.message);
-            step.value = 1;  // Correction ici
+            toastFunction('error', formErrors.value.return_date.message);
+            step.value = 1;
             return;
         }
 
@@ -172,76 +172,71 @@ const changeStep = (newStep) => {
 };
 
 
-// Charger les villes depuis l'API
 
-const fetchCities = async () => {
-    try {
-        const response = await fetch(`${baseUrl}/cities`);
-        if (!response.ok) throw new Error("Erreur lors du chargement des villes");
-        cities.value = await response.json();
-    } catch (error) {
-        showError("Impossible de charger les villes.");
-    }
-};
+    const fetchCities = async () => {
+        try {
+            const response = await fetch(`${baseUrl}/cities`);
+            if (!response.ok) throw new Error("Erreur lors du chargement des villes");
+            cities.value = await response.json();
+        } catch (error) {
+            toastFunction('error', 'Impossible de charger les villes.');
+        }
+    };
 
-onMounted(() => {
-    fetchCities();
-});
+    onMounted(() => {
+        fetchCities();
+    });
 
 
-// Valider et soumettre le formulaire
 
 const submitForm = async () => {
     if (!form.value.name || !form.value.email || !form.value.phone) {
         formErrors.value.customerInfo.error = true;
-        showError(formErrors.value.customerInfo.message);
+        toastFunction('error', formErrors.value.customerInfo.message);
         return;
     }
-    console.log(form.value);
 
     try {
         buttonLoading.value = true;
         await axios.post(`${baseUrl}/flight-hotel`, form.value);
-        showSummary();
+        
     } catch (error) {
-        showError("Échec de la soumission. Vérifiez votre connexion.");
+        toastFunction('error', 'Échec lors de la soumission. Vérifiez votre connexion.');
     } finally {
         buttonLoading.value = false;
+        step.value = 1;
+
+        form.value.flight_type = "one_way";
+        form.value.departure_city_id =  1;
+        form.value.destination_city_id =  2;
+        form.value.departure_date =  "";
+        form.value.return_date =  "";
+        form.value.passengers =  1;
+        form.value.flight_class =  "economy";
+        form.value.name =  "";
+        form.value.email =  "";
+        form.value.phone =  "";
+
+        toastFunction('success', 'Votre reservation a été soumise avec succès.')
     }
 };
 
 
-const showError = (message) => {
-    Swal.fire({
-        icon: "error",
-        title: "Erreur",
-        text: message,
+const toastFunction = (type, message) => {
+        const Toast = Swal.mixin({
         toast: true,
         position: "top-end",
         showConfirmButton: false,
-        timer: 5000,
+        timer: 3000,
         timerProgressBar: true,
-    });
-};
-
-const showSummary = () => {
-    Swal.fire({
-        title: "Récapitulatif de la réservation",
-        html: `
-            <b>Type de vol :</b> ${form.value.flight_type}<br>
-            <b>Ville de départ :</b> ${form.value.departure_city_id}<br>
-            <b>Ville d'arrivée :</b> ${form.value.destination_city_id}<br>
-            <b>Date de départ :</b> ${form.value.departure_date}<br>
-            <b>Date de retour :</b> ${form.value.return_date || "Non applicable"}<br>
-            <b>Passagers :</b> ${form.value.passengers}<br>
-            <b>Classe :</b> ${form.value.flight_class}<br>
-            <hr>
-            <b>Nom :</b> ${form.value.name}<br>
-            <b>Email :</b> ${form.value.email}<br>
-            <b>Téléphone :</b> ${form.value.phone}
-        `,
-        icon: "success",
-        confirmButtonText: "OK",
-    });
-};
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+        });
+        Toast.fire({
+        icon: type,
+        title: message
+        });
+    };
 </script>

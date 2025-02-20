@@ -1,5 +1,5 @@
 <template>
-    <div class="flex h-screen bg-gray-100">
+    <div class="flex h-screen bg-white">
         <!-- Sidebar -->
         <div 
             :class="isOpen ? 'w-40' : 'w-60'" 
@@ -30,16 +30,16 @@
                             </router-link>
                         </li>
                         <li class="rounded-sm">
-                            <router-link to="/bookings" 
-                                         :class="isActive('/bookings')" 
+                            <router-link to="/dashboard/bookings" 
+                                         :class="isActive('/dashboard/bookings')" 
                                          class="flex items-center p-2 space-x-3 rounded-md text-gray-100 hover:bg-gray-700">
                                 <ListChecks class="w-6 h-6" />
                                 <span v-if="!isOpen">Réservations</span>
                             </router-link>
                         </li>
                         <li class="rounded-sm mb-2">
-                            <router-link to="/customers" 
-                                         :class="isActive('/customers')" 
+                            <router-link to="/dashboard/customers" 
+                                         :class="isActive('/dashboard/customers')" 
                                          class="flex items-center p-2 space-x-3 rounded-md text-gray-100 hover:bg-gray-700">
                                 <Users class="w-6 h-6" />
                                 <span v-if="!isOpen">Clients</span>
@@ -47,8 +47,8 @@
                         </li>
                         <hr>
                         <li class="rounded-sm mt-2">
-                            <router-link to="/managers" 
-                                         :class="isActive('/managers')" 
+                            <router-link to="/dashboard/managers" 
+                                         :class="isActive('/dashboard/managers')" 
                                          class="flex items-center p-2 space-x-3 rounded-md text-gray-100 hover:bg-gray-700">
                                 <LucideLock class="w-6 h-6" />
                                 <span v-if="!isOpen">Mon équipe</span>
@@ -66,16 +66,16 @@
                 <h1 :class="isOpen ? 'pl-40' : 'pl-60'" class="text-lg font-bold text-gray-700">Tableau de bord</h1>
 
                 <!-- Dropdown -->
-                <div class="relative">
-                    <button @click="openDropDown = !openDropDown" class="text-gray-900 font-bold flex items-center">
-                        <span class="mr-2">{{ user.name }}</span>
-                        <img :src="Person" class="rounded-full w-10 h-10" alt="Avatar">
+                <div class="relative" ref="dropdownContainer">
+                    <button @click="toggleDropDown" class="text-gray-900 font-bold flex items-center">
+                    <span class="mr-2">{{ user.name }}</span>
+                    <img :src="Person" class="rounded-full w-10 h-10" alt="Avatar">
                     </button>
 
                     <!-- Contenu de la dropdown -->
                     <div v-if="openDropDown" class="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
-                        <router-link to="/dashboard/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profil</router-link>
-                        <button @click="logout()" class="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100">Déconnexion</button>
+                    <router-link to="/dashboard/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profil</router-link>
+                    <button @click="logout()" class="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100">Déconnexion</button>
                     </div>
                 </div>
             </nav>
@@ -83,7 +83,7 @@
             <!-- Contenu avec padding pour éviter d'être caché sous la navbar -->
             <div class="container mx-auto mt-20 px-6">
                 <main>
-                    <slot></slot>
+                    <router-view></router-view>
                 </main>
             </div>
         </div>
@@ -91,8 +91,8 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from 'vue';
-import { useRouter, useRoute } from "vue-router";
+import { onMounted, onUnmounted, ref, computed } from 'vue';
+import { useRouter, useRoute, RouterView } from "vue-router";
 import { Home, ListChecks, Users, LucideLock } from 'lucide-vue-next';
 import axios from "axios";
 import Logo from '../Assets/Images/logo.png';
@@ -101,14 +101,36 @@ import AppDatas from '../Services/app.js';
 
 const isOpen = ref(false);
 const openDropDown = ref(false);
+const dropdownContainer = ref(null);
 const router = useRouter();
 const route = useRoute();
 const user = ref({});
 
-// Détermine si un lien est actif
-const isActive = (path) => route.path === path ? 'bg-gray-500 text-gray-950' : '';
+const toggleDropDown = () => {
+  openDropDown.value = !openDropDown.value;
+};
 
-// Récupérer les infos utilisateur
+
+const handleClickAway = (event) => {
+  if (dropdownContainer.value && !dropdownContainer.value.contains(event.target)) {
+    openDropDown.value = false;
+  }
+};
+
+
+onMounted(() => {
+  document.addEventListener('click', handleClickAway);
+});
+
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickAway);
+});
+
+
+const isActive = (path) => route.path === path ? 'bg-gray-100 text-gray-950' : '';
+
+
 const getUserInfo = async () => {
     try {
         const response = await axios.get(`${AppDatas.baseUrl}/user`, {
@@ -116,7 +138,7 @@ const getUserInfo = async () => {
         });
         user.value = response.data;
     } catch (error) {
-        console.error("Erreur lors de la récupération des données de l'utilisateur", error);
+        console.error("Erreur lors de la récupération des données de l'utilisateur.", error);
     }
 };
 
@@ -142,7 +164,10 @@ const logout = async () => {
 
 // Initialisation
 onMounted(() => {
-    getUserInfo();
+    if(localStorage.getItem('token'))
+    {
+        getUserInfo();
+    }
 });
 </script>
 

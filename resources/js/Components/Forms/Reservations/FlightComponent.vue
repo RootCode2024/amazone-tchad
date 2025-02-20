@@ -53,21 +53,15 @@
                         <option v-for="city in cities" :key="city.id" :value="city.id">{{ city.name }}</option>
                     </select></div>
 
-                    <div>
-                        <label for="departure_date" class="block text-sm font-medium">Date de départ</label>
-                        <Datepicker v-model="form.departure_date" :min-date="new Date()" :enable-time-picker="false" />
-                    </div>
+                <div>
+                    <label for="departure_date" class="block text-sm font-medium">Date de départ</label>
+                    <input type="date" id="departure_date" v-model="form.departure_date" class="border p-2 rounded w-full" :class="{ 'border-red-500 text-red-500': formErrors.departure_date.error }">
+                </div>
 
-                    <div>
-                        <label for="return_date" class="block text-sm font-medium">Date de retour</label>
-                        <Datepicker 
-                            v-model="form.return_date" 
-                            :min-date="new Date()" 
-                            :enable-time-picker="false" 
-                            :disabled="form.flight_type === 'one_way'" 
-                        />
-                    </div>
-
+                <div>
+                    <label for="return_date" class="block text-sm font-medium">Date de retour</label>
+                    <input type="date" id="return_date" v-model="form.return_date" class="border p-2 rounded w-full" :class="{ 'border-red-500 text-red-500': formErrors.return_date.error || form.flight_type == 'round_trip' }" :disabled="form.flight_type === 'one_way'">
+                </div>
                 <div class="flex items-end">
                     <button type="button" @click="changeStep(2)" class="bg-indigo-500 text-white px-6 py-2 rounded">Suivant</button>
                 </div>
@@ -114,19 +108,17 @@
 </template>
 
 <script setup>
-    import { ref } from "vue";
-    import Swal from "sweetalert2";
-    import { onMounted } from "vue";
-    import axios from 'axios';
-    import AppDatas from '../../../Services/app.js';
-    import Datepicker from '@vuepic/vue-datepicker';
-    import '@vuepic/vue-datepicker/dist/main.css';
+import { ref } from "vue";
+import Swal from "sweetalert2";
+import { onMounted } from "vue";
+import axios from 'axios';
+import AppDatas from '../../../Services/app.js';
 
-    const baseUrl = AppDatas.baseUrl;
+const baseUrl = AppDatas.baseUrl;
 
-    const step = ref(1);
-    const cities = ref([]);
-    const buttonLoading = ref(false);
+const step = ref(1);
+const cities = ref([]);
+const buttonLoading = ref(false);
 
 const form = ref({
     flight_type: "one_way",
@@ -148,6 +140,7 @@ const formErrors = ref({
     email: { error: false, message: "Veuillez saisir une adresse email valide." },
     phone: { error: false, message: "Veuillez saisir un numéro de téléphone valide." },
     dates: { error: false, message: "La date du départ doit être inferieur à la date de retour." },
+    customerInfo: { error: false, message: "Verifier que le nom, l'email et le numero sont bien entrées." },
 });
 
 // Changer de step

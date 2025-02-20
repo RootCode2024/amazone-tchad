@@ -64,32 +64,27 @@ class CarLocationController extends Controller
         $request->validate([
             'newStatus' => 'required|string|in:pending,approved,rejected',
             'note' => 'nullable|string',
-            'departureDate' => 'required_if:newStatus,rejected|date',
-            'price' => 'required_if:newStatus,rejected|numeric',
+            'startedDate' => 'required_if:newStatus,rejected|date',
+            'price' => 'nullable',
         ]);
 
         $carLocation = CarLocation::findOrFail($id);
 
         if (!$carLocation) {
-            return response()->json(['error' => 'Location Vehicule non trouvé'], 404);
+            return response()->json(['error' => 'Location de voiture non trouvée'], 404);
         }
 
-        if ($request->newStatus === 'rejected')
-        {
-            $carLocation->note = $request->note;
-            $carLocation->started_date = $request->startedDate;
-            $carLocation->started_date = $request->endedDate;
-            $carLocation->price = $request->price;
-        }
-
+        $carLocation->note = $request->note;
+        $carLocation->started_date = $request->startedDate;
+        $carLocation->price = $request->price;
         $carLocation->status = $request->newStatus;
 
         $carLocation->save();
 
         // Envoi d'un e-mail au client
-        Mail::to($carLocation->customer->email)->send(new ReservationStatusChangeMail($carLocation, 'LOCATION DE VEHICULE'));
+        Mail::to($carLocation->customer->email)->send(new ReservationStatusChangeMail($carLocation, 'LOCATION'));
 
-        return response()->json(['message' => 'Statut du vol mis à jour']);
+        return response()->json(['message' => 'Statut de la location mis à jour.']);
     }
 
     /**

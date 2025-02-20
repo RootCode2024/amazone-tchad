@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="text-2xl font-bold mb-4">Liste des reservations de vehicule</h1>
+    <h1 class="text-2xl font-bold mb-4">Liste des réservations de vehicule</h1>
 
     <div class="bg-white p-4 rounded-lg shadow-md">
       <!-- Barre de recherche -->
@@ -27,6 +27,10 @@
           </tr>
         </thead>
         <tbody>
+          <tr v-if="props.carLocations.length === 0">
+            <td colspan="7" class="text-center text-red-400 p-3">Aucun vol enregistré...</td>
+          </tr>
+
           <tr v-for="(car, index) in filteredCars" :key="car.id" class="border-b">
             <td class="p-3">{{ index + 1 }}</td>
             <td class="p-3">{{ car.customer.name }}</td>
@@ -53,7 +57,7 @@
             </td>
             <td class="p-3 flex space-x-2">
               <router-link
-                :to="`/bookings/car-location/${car.id}`"
+                :to="`/dashboard/bookings/car-location/${car.id}`"
                 class="bg-indigo-600 text-white px-1 py-1 rounded-lg text-sm hover:bg-indigo-700"
               >
                 <Eye class="w-4 h-4" />
@@ -74,8 +78,8 @@
         <button @click="prevPage" :disabled="currentPage === 1" class="px-4 py-2 bg-gray-300 rounded-lg">
           Précédent
         </button>
-        <span>Page {{ currentPage }} / {{ totalPages }}</span>
-        <button @click="nextPage" :disabled="currentPage === totalPages" class="px-4 py-2 bg-gray-300 rounded-lg">
+        <span v-if="totalPages > 0">Page {{ currentPage }} / {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="currentPage === totalPages || totalPages === 0" class="px-4 py-2 bg-gray-300 rounded-lg">
           Suivant
         </button>
       </div>
@@ -83,7 +87,7 @@
     <!-- 🚀 MODALE -->
     <div v-if="isModalOpen" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
-        <h2 class="text-xl font-bold mb-4">Modifier le statut du vol :</h2>
+        <h2 class="text-xl font-bold mb-4">Modifier le statut de la location :</h2>
         
         <label class="block mb-2">Nouveau Statut</label>
         <select v-model="selectedStatus" class="w-full border p-2 rounded-lg">
@@ -94,18 +98,18 @@
         <form @submit.prevent="updateStatus" v-if="selectedStatus === 'rejected'" class="mt-4">
           <div class="py-2">
             <label for="reason" class="block mb-2">Raison du rejet :</label>
-            <textarea v-model="formRejectedStatus.rejectionReason" id="reason" placeholder="Nous avons pas pu trouver un vol pour la date demandé mais ..." class="w-full border p-2 rounded-lg"></textarea>
+            <textarea v-model="formStatus.reason" id="reason" placeholder="Nous avons pas pu trouver une location pour la date demandé mais ..." class="w-full border p-2 rounded-lg"></textarea>
           </div>
           <div class="py-2">
             <label for="departure_date">Date de début</label>
-            <input type="date" v-model="formRejectedStatus.startedDate" class="w-full border p-2 rounded-lg" />
+            <input type="date" v-model="formStatus.startedDate" class="w-full border p-2 rounded-lg" />
           </div>
           <div class="py-2">
             <label for="price">Prix</label>
-            <input type="number" v-model="formRejectedStatus.price" class="w-full border p-2 rounded-lg" />
+            <input type="number" v-model="formStatus.price" class="w-full border p-2 rounded-lg" />
           </div>
           <div class="flex justify-end mt-4">
-            <button @click="closeModal" class="px-4 py-2 bg-gray-300 rounded-lg mr-2">Annuler</button>
+            <button @click="closeModal()" class="px-4 py-2 bg-gray-300 rounded-lg mr-2">Annuler</button>
             <button type="submit" :disabled="buttonLoading" class="px-4 py-2 min-w-28 bg-blue-600 text-white rounded-lg">
               <span v-if="!buttonLoading">Enregistrer</span>
               <div v-else class="flex items-center">
@@ -119,6 +123,10 @@
           </div>
         </form>
         <form @submit.prevent="updateStatus" v-else>
+          <div class="py-2" v-if="selectedStatus === 'approved'">
+            <label for="price">Prix</label>
+            <input type="number" v-model="formStatus.price" class="w-full border p-2 rounded-lg" />
+          </div>
           <div class="my-2" v-if="!takeNote">
             <button
               type="button"
@@ -137,14 +145,14 @@
               <textarea
                 id="note"
                 name="note"
-                v-model="note"
+                v-model="formStatus.reason"
                 class="w-full border p-2 rounded-lg"
                 placeholder="Saisissez votre note ici..."
               ></textarea>
             </div>
           </div>
           <div class="flex justify-end mt-4">
-            <button @click="closeModal" type="button" class="px-4 py-2 bg-gray-300 rounded-lg mr-2">
+            <button @click="closeModal()" type="button" class="px-4 py-2 bg-gray-300 rounded-lg mr-2">
               Annuler
             </button>
             <button type="submit" :disabled="buttonLoading" class="px-4 py-2 min-w-28 bg-blue-600 text-white rounded-lg">
@@ -159,8 +167,6 @@
             </button>
           </div>
         </form>
-
-
       </div>
     </div>
   </div>
@@ -188,37 +194,36 @@
 
   // 🔹 État pour gérer la modale
   const isModalOpen = ref(false);
-  const selectedCar = ref(null);
+  const selectedCarLocation = ref(null);
   const selectedStatus = ref("");
-  const note = ref("");
   const buttonLoading = ref(false);
 
-  const formRejectedStatus = ref({
-    newStatus: "rejected",
-    rejectionReason: "",
+
+  const formStatus = ref({
+    newStatus: "",
+    reason: "",
     startedDate: "",
-    price: "",
+    price: 1,
   });
 
   // 🔹 Ouvrir la modale avec les infos du vehicule sélectionné
-  const openStatusModal = (car) => {
-    selectedCar.value = car;
-    selectedStatus.value = car.status;
-    isModalOpen.value = true;
-    note.value = car.note;
+  const openStatusModal = (car_location) => {
 
-    if (car.status === "rejected") {
-      formRejectedStatus.value.rejectionReason = car.note;
-      formRejectedStatus.value.startedDate = car.started_date;
-      formRejectedStatus.value.price = car.price;
-    }
+  selectedCarLocation.value = car_location;
+  selectedStatus.value = car_location.status;
+  isModalOpen.value = true;
+
+  formStatus.value.reason = car_location.note;
+  formStatus.value.price = car_location.price;
+  formStatus.value.startedDate = car_location.started_date;
+
   };
 
   // 🔹 Fermer la modale
   const closeModal = () => {
-    isModalOpen.value = false;
-    selectedCar.value = null;
-    selectedStatus.value = "";
+  isModalOpen.value = false;
+  selectedCarLocation.value = null;
+  selectedStatus.value = "";
   };
 
   // Ici on accède aux données et applique un filtre de recherche
@@ -256,45 +261,36 @@
 
   //Changement de statut
   const updateStatus = async () => {
-    if (!selectedCar.value) return;
+    if (!selectedCarLocation.value) return;
 
     // Vérifier que si le statut est "rejected", la raison est renseignée
-    if (selectedStatus.value === "rejected" && !formRejectedStatus.value.rejectionReason) {
+    if (selectedStatus.value === "rejected" && !formStatus.value.reason) {
       errorMessage.value = "La raison du rejet est requise.";
       return;
     }
 
     // Construire le payload selon le statut choisi
-    let payload = {};
-    if (selectedStatus.value === "rejected") {
-      payload = {
-        newStatus: "rejected",
-        note: formRejectedStatus.value.rejectionReason,
-        startedDate: formRejectedStatus.value.startedDate,
-        price: formRejectedStatus.value.price,
-      };
-    } else {
-      payload = {
-        newStatus: selectedStatus.value,
-        note: note.value,
-      };
-    }
-
+    let payload = {
+      newStatus: selectedStatus.value,
+      note: formStatus.value.reason,
+      startedDate: formStatus.value.startedDate,
+      price: formStatus.value.price,
+    };
+    
     try {
       buttonLoading.value = true;
       const response = await axios.put(
-        `${AppDatas.baseUrl}/car-locations/${selectedCar.value.id}/status`,
+        `${AppDatas.baseUrl}/car-locations/${selectedCarLocation.value.id}/status`,
         payload
       );
       console.log(response.data);
       
-      // Mettre à jour localement le statut du vehicule
-      selectedCar.value.status = selectedStatus.value;
+      // Mettre à jour localement le statut de la location
+      selectedCarLocation.value.status = selectedStatus.value;
       
       // Fermer la modale après la mise à jour
       closeModal();
     } catch (error) {
-      console.error("Erreur lors de la mise à jour du statut", error);
       errorMessage.value = "Erreur lors de la mise à jour du statut. Veuillez réessayer.";
     } finally {
       buttonLoading.value = false;
@@ -302,7 +298,7 @@
     }
   };
 
-  // ⚡ Fonction pour supprimer un vol+hotel
+  // ⚡ Fonction pour supprimer un car
   const confirmDelete = async (car) => {
     Swal.fire({
         title: "Êtes-vous sûr ?",

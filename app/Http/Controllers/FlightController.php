@@ -62,7 +62,7 @@ class FlightController extends Controller
             'newStatus' => 'required|string|in:pending,approved,rejected',
             'note' => 'nullable|string',
             'departureDate' => 'required_if:newStatus,rejected|date',
-            'price' => 'required_if:newStatus,rejected|numeric',
+            'price' => 'nullable',
         ]);
 
         $flight = Flight::findOrFail($id);
@@ -71,13 +71,10 @@ class FlightController extends Controller
             return response()->json(['error' => 'Vol non trouvé'], 404);
         }
 
-        if ($request->newStatus === 'rejected')
-        {
-            $flight->note = $request->note;
-            $flight->departure_date = $request->departureDate;
-            $flight->price = $request->price;
-        }
-
+        
+        $flight->note = $request->note;
+        $flight->departure_date = $request->departureDate;
+        $flight->price = $request->price;
         $flight->status = $request->newStatus;
 
         $flight->save();

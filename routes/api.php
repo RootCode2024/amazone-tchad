@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CarLocationController;
 use App\Http\Controllers\CityController;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 
 
 
+
 Route::get('/sanctum/csrf-cookie', function (Request $request) {
     return response()->json(['message' => 'CSRF Cookie set']);
 });
@@ -21,6 +23,7 @@ Route::prefix('managers')->group(function () {
     Route::get('/', [ManagerController::class, 'index']);
     Route::get('/{id}', [ManagerController::class, 'show']);
     Route::post('/', [ManagerController::class, 'store']);
+    Route::put('/', [ManagerController::class, 'update']);
     Route::put('/password', [ManagerController::class, 'updatePassword']);
     Route::delete('/{id}', [ManagerController::class, 'destroy']);
 });
@@ -90,6 +93,11 @@ Route::prefix('bookings')->group(function () {
 // Routes publiques (sans authentification)
 Route::post('login', [AuthController::class, 'login'])->name('auth.login');
 Route::post('register', [AuthController::class, 'register'])->name('auth.register');
+
+
+Route::get('password/reset/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+
+
 
 // Routes protégées avec Sanctum
 Route::middleware('auth:sanctum')->group(function () {

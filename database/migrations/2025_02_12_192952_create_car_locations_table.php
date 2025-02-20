@@ -20,6 +20,8 @@ return new class extends Migration
             $table->date('started_date');
             $table->date('ended_date');
             $table->unsignedInteger('age');
+            $table->text('note')->nullable();
+            $table->unsignedBigInteger('price')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
         });

@@ -110,26 +110,31 @@
             <XCircle class="w-5 h-5 text-red-600 mr-2" />
             <span class="font-semibold">Raison du rejet :</span>
           </div>
-          <p>{{ flight.note }}</p>
+          <p>{{ flight.note }}</p><br>
           <div class="flex items-center mb-4">
             <Calendar class="w-5 h-5 text-red-600 mr-2" />
-            <span class="font-semibold">Date de départ modifiée :</span>
+            <span class="font-semibold mr-2">Date de départ modifiée :</span>
+            <p>{{ formatDate(flight.departure_date) }}</p>
           </div>
-          <p>{{ formatDate(flight.departure_date) }}</p>
           <div class="flex items-center mb-4">
             <DollarSign class="w-5 h-5 text-red-600 mr-2" />
-            <span class="font-semibold">Prix :</span>
+            <span class="font-semibold mr-2">Prix :</span>
+            <p>{{ flight.price.toLocaleString() }} F CFA</p>
           </div>
-          <p>{{ flight.price }}</p>
         </div>
   
         <!-- Notes associées au vol -->
-        <div v-if="flight.note" class="mt-6 p-4 bg-yellow-50 rounded border-l-4 border-yellow-500">
+        <div v-if="flight.note && flight.status !== 'rejected'" class="mt-6 p-4 bg-yellow-50 rounded border-l-4 border-yellow-500">
           <div class="flex items-center mb-4">
             <Edit class="w-5 h-5 text-yellow-500 mr-2" />
             <span class="font-semibold">Note :</span>
           </div>
-          <p>{{ flight.note }}</p>
+          <p>{{ flight.note }}</p><br>
+          <div class="flex items-center mb-4" v-if="flight.price">
+            <DollarSign class="w-5 h-5 text-yellow-600 mr-2" />
+            <span class="font-semibold mr-2">Prix :</span>
+            <p>{{ flight.price.toLocaleString() }} F CFA</p>
+          </div>
         </div>
   
         <!-- Bouton de retour -->

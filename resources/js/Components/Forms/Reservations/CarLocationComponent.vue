@@ -112,21 +112,21 @@ const changeStep = (newStep) => {
     if (newStep === 2) {
         if (!form.value.started_date) {
             formErrors.value.started_date.error = true;
-            showError(formErrors.value.started_date.message);
+            toastFunction('error', formErrors.value.started_date.message);
             step.value = 1;
             return;
         }
 
         if (!form.value.ended_date) {
             formErrors.value.ended_date.error = true;
-            showError(formErrors.value.ended_date.message);
+            toastFunction('error', formErrors.value.ended_date.message);
             step.value = 1;
             return;
         }
 
         if (form.value.age < 16) {
             formErrors.value.age.error = true;
-            showError(formErrors.value.age.message);
+            toastFunction('error', formErrors.value.age.message);
             step.value = 1;
             return;
         }
@@ -143,7 +143,7 @@ const fetchCities = async () => {
         if (!response.ok) throw new Error("Erreur lors du chargement des villes");
         cities.value = await response.json();
     } catch (error) {
-        showError("Impossible de charger les villes.");
+        toastFunction('error', 'Impossible de charger les villes.');
     }
 };
 
@@ -155,18 +155,29 @@ onMounted(() => {
 const submitForm = async () => {
     if (!form.value.name || !form.value.email || !form.value.phone) {
         formErrors.value.customerInfo.error = true;
-        showError(formErrors.value.customerInfo.message);
+        toastFunction('error', formErrors.value.customerInfo.message);
         return;
     }
 
     try {
         buttonLoading.value = true;
         await axios.post(`${baseUrl}/car-locations`, form.value);
-        // showSummary();
+        
     } catch (error) {
-        showError("Échec de la soumission. Vérifiez votre connexion.");
+        toastFunction('error', 'Échec lors de la soumission. Vérifiez votre connexion.');
     } finally {
         buttonLoading.value = false;
+        step.value = 1;
+
+        form.value.place_of_location =  5;
+        form.value.started_date =  "";
+        form.value.ended_date =  "";
+        form.value.age =  16;
+        form.value.name =  "";
+        form.value.email =  "";
+        form.value.phone =  "";
+
+        toastFunction('success', 'Votre reservation a été soumise avec succès.')
     }
 };
 
@@ -183,21 +194,21 @@ const showError = (message) => {
     });
 };
 
-// const showSummary = () => {
-//     Swal.fire({
-//         title: "Récapitulatif de la réservation",
-//         html: `
-//             <b>Lieu de location :</b> ${form.value.place_of_location}<br>
-//             <b>Date de début :</b> ${form.value.started_date}<br>
-//             <b>Date de fin :</b> ${form.value.ended_date}<br>
-//             <b>Âge du conducteur :</b> ${form.value.age}<br>
-//             <hr>
-//             <b>Nom :</b> ${form.value.name}<br>
-//             <b>Email :</b> ${form.value.email}<br>
-//             <b>Téléphone :</b> ${form.value.phone}
-//         `,
-//         icon: "success",
-//         confirmButtonText: "OK",
-//     });
-// };
+const toastFunction = (type, message) => {
+        const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+        });
+        Toast.fire({
+        icon: type,
+        title: message
+        });
+    };
 </script>

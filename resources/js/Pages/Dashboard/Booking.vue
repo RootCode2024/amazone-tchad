@@ -1,36 +1,33 @@
 <template>
-  <Layout>
-    <div class="p-6">
-      <h1 class="text-3xl font-bold mb-6">📋 Gestion des Réservations</h1>
+  <div class="p-6">
+    <h1 class="text-3xl font-bold mb-6">📋 Gestion des Réservations</h1>
 
-      <!-- Onglets -->
-      <div class="flex space-x-4 border-b mb-6">
-        <button
-          v-for="tab in tabs"
-          :key="tab.name"
-          @click="activeTab = tab.name"
-          class="px-6 py-3 text-lg font-semibold border-b-4 transition"
-          :class="activeTab === tab.name ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600'"
-        >
-          <component :is="tab.icon" class="inline-block w-5 h-5 mr-2" />
-          {{ tab.label }}
-        </button>
-      </div>
-
-      <!-- Contenu des Onglets -->
-      <div class="bg-white p-6 rounded-lg shadow-md">
-        <Flights v-if="activeTab === 'flights'" :flights="flightsDatas" />
-        <Hotels v-if="activeTab === 'hotels'" :hotels="hotelsDatas" />
-        <FlightHotel v-if="activeTab === 'flightHotel'" :flighthotels="flightHotelsDatas" />
-        <CarLocation v-if="activeTab === 'carLocation'" :carLocations="carLocationsDatas" />
-      </div>
+    <!-- Onglets -->
+    <div class="flex space-x-4 border-b mb-6">
+      <button
+        v-for="tab in tabs"
+        :key="tab.name"
+        @click="activeTab = tab.name"
+        class="px-6 py-3 text-lg font-semibold border-b-4 transition"
+        :class="activeTab === tab.name ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600'"
+      >
+        <component :is="tab.icon" class="inline-block w-5 h-5 mr-2" />
+        {{ tab.label }}
+      </button>
     </div>
-  </Layout>
+
+    <!-- Contenu des Onglets -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+      <Flights v-if="activeTab === 'flights'" :flights="flightsDatas" />
+      <Hotels v-if="activeTab === 'hotels'" :hotels="hotelsDatas" />
+      <FlightHotel v-if="activeTab === 'flightHotel'" :flighthotels="flightHotelsDatas" />
+      <CarLocation v-if="activeTab === 'carLocation'" :carLocations="carLocationsDatas" />
+    </div>
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
-import Layout from "../../Layouts/AppLayout.vue";
 import Flights from "../../Components/BookingComponents/Flight.vue";
 import Hotels from "../../Components/BookingComponents/Hotel.vue";
 import FlightHotel from "../../Components/BookingComponents/FlightHotel.vue";

@@ -68,22 +68,18 @@ class FlightHotelController extends Controller
             'newStatus' => 'required|string|in:pending,approved,rejected',
             'note' => 'nullable|string',
             'departureDate' => 'required_if:newStatus,rejected|date',
-            'price' => 'required_if:newStatus,rejected|numeric',
+            'price' => 'nullable',
         ]);
 
         $flighthotel = FlightHotel::findOrFail($id);
 
         if (!$flighthotel) {
-            return response()->json(['error' => 'Vol non trouvé'], 404);
+            return response()->json(['error' => 'Vol + Hotel non trouvé'], 404);
         }
 
-        if ($request->newStatus === 'rejected')
-        {
-            $flighthotel->note = $request->note;
-            $flighthotel->departure_date = $request->departureDate;
-            $flighthotel->price = $request->price;
-        }
-
+        $flighthotel->note = $request->note;
+        $flighthotel->departure_date = $request->departureDate;
+        $flighthotel->price = $request->price;
         $flighthotel->status = $request->newStatus;
 
         $flighthotel->save();
