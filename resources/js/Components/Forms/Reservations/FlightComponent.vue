@@ -1,32 +1,38 @@
 <template>
-    <form @submit.prevent="submitForm()" class="p-6 flex flex-col space-y-4 max-w-4xl mx-auto">
+    <form @submit.prevent="submitForm()" class="p-6 flex flex-col space-y-4 max-w-4xl mx-auto w-full">
         
         <!-- Étape 1 : Détails du vol -->
         <div v-if="step === 1">                
-            <div class="grid grid-cols-5 gap-4 py-5">
-                <h2 class="col-span-5 text-sm italic">Veuillez remplir les informations du vol pour continuer.</h2>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 py-5">
+                <h2 class="col-span-5 text-sm italic text-center">Veuillez remplir les informations du vol pour continuer.</h2>
             </div>
             <hr>
-            <div class="flex justify-between space-x-4 mb-4">
+            <div class="flex flex-col md:flex-row justify-between space-x-0 md:space-x-4 mb-4">
                 <!-- Sélection du type de vol -->
-                <div class="flex flex-col space-y-2 text-sm italic">
+                <div class="flex flex-col space-y-2 text-sm italic w-full">
                     <label class="font-medium">Type de vol</label>
-                    <div class="flex items-center space-x-4">
-                        <input type="radio" v-model="form.flight_type" value="one_way" id="one_way">
-                        <label for="one_way">Aller simple</label>
+                    <div class="flex flex-wrap items-center space-x-4">
+                        <label for="one_way" class="flex items-center space-x-2">
+                            <input type="radio" v-model="form.flight_type" value="one_way" id="one_way">
+                            <span>Aller simple</span>
+                        </label>
                         
-                        <input type="radio" v-model="form.flight_type" value="round_trip" id="round_trip">
-                        <label for="round_trip">Aller - Retour</label>
+                        <label for="round_trip" class="flex items-center space-x-2">
+                            <input type="radio" v-model="form.flight_type" value="round_trip" id="round_trip">
+                            <span>Aller - Retour</span>
+                        </label>
                         
-                        <input type="radio" v-model="form.flight_type" value="multi_destination" id="multi_destination">
-                        <label for="multi_destination">Multi Destination</label>
+                        <label for="multi_destination" class="flex items-center space-x-2">
+                            <input type="radio" v-model="form.flight_type" value="multi_destination" id="multi_destination">
+                            <span>Multi Destination</span>
+                        </label>
                     </div>
                 </div>
 
                 <!-- Nombre de passagers et classe -->
-                <div class="flex flex-col space-y-2 text-sm italic">
+                <div class="flex flex-col space-y-2 text-sm italic w-full">
                     <label class="font-medium">Passagers et classe</label>
-                    <div class="flex space-x-2">
+                    <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
                         <input type="number" v-model="form.passengers" min="1" max="10" class="border p-2 rounded w-full" placeholder="Nombre de passagers">
 
                         <select v-model="form.flight_class" class="border p-2 rounded w-full">
@@ -39,7 +45,7 @@
             </div>
 
             <!-- Sélection des villes et dates -->
-            <div class="grid grid-cols-5 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <div>
                     <label for="departure_city_id" class="block text-sm font-medium">Origine</label>
                     <select id="departure_city_id" v-model="form.departure_city_id" class="border p-2 rounded w-full">
@@ -51,61 +57,56 @@
                     <label for="destination_city_id" class="block text-sm font-medium">Destination</label>
                     <select id="destination_city_id" v-model="form.destination_city_id" class="border p-2 rounded w-full">
                         <option v-for="city in cities" :key="city.id" :value="city.id">{{ city.name }}</option>
-                    </select></div>
+                    </select>
+                    <p v-if="form.departure_city_id === form.destination_city_id && form.departure_city_id" class="text-red-500 text-sm">La ville de départ et d’arrivée doivent être différentes.</p>
+                </div>
 
                 <div>
                     <label for="departure_date" class="block text-sm font-medium">Date de départ</label>
-                    <input type="date" id="departure_date" v-model="form.departure_date" class="border p-2 rounded w-full" :class="{ 'border-red-500 text-red-500': formErrors.departure_date.error }">
+                    <input type="date" id="departure_date" v-model="form.departure_date" class="border p-2 rounded w-full">
                 </div>
 
                 <div>
                     <label for="return_date" class="block text-sm font-medium">Date de retour</label>
-                    <input type="date" id="return_date" v-model="form.return_date" class="border p-2 rounded w-full" :class="{ 'border-red-500 text-red-500': formErrors.return_date.error || form.flight_type == 'round_trip' }" :disabled="form.flight_type === 'one_way'">
+                    <input type="date" id="return_date" v-model="form.return_date" class="border p-2 rounded w-full" :disabled="form.flight_type === 'one_way'">
                 </div>
                 <div class="flex items-end">
-                    <button type="button" @click="changeStep(2)" class="bg-indigo-500 text-white px-6 py-2 rounded">Suivant</button>
+                    <button type="button" @click="changeStep(2)" class="bg-indigo-500 text-white px-6 py-2 rounded w-full">Suivant</button>
                 </div>
             </div>
         </div>
 
         <!-- Étape 2 : Informations du voyageur -->
         <div v-if="step === 2">
-            <div class="grid grid-cols-5 gap-4 py-5">
-                <h2 class="col-span-5 text-sm italic">Veuillez remplir les informations du voyageur pour valider.</h2>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 py-5">
+                <h2 class="col-span-5 text-sm italic text-center">Veuillez remplir les informations du voyageur pour valider.</h2>
             </div>
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700">Nom</label>
-                    <input type="text" id="name" v-model="form.name" placeholder="Nom" class="border p-2 rounded w-full" :class="{ 'border-red-500 text-red-500': formErrors.name.error }">
+                    <input type="text" id="name" v-model="form.name" placeholder="Nom" class="border p-2 rounded w-full">
                 </div>
                 
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" id="email" v-model="form.email" placeholder="Email" class="border p-2 rounded w-full" :class="{ 'border-red-500 text-red-500': formErrors.email.error }">
+                    <input type="email" id="email" v-model="form.email" placeholder="Email" class="border p-2 rounded w-full">
                 </div>
 
                 <div>
                     <label for="phone" class="block text-sm font-medium text-gray-700">Téléphone</label>
-                    <input type="tel" id="phone" v-model="form.phone" placeholder="Téléphone" class="border p-2 rounded w-full" :class="{ 'border-red-500 text-red-500': formErrors.phone.error }">
+                    <input type="tel" id="phone" v-model="form.phone" placeholder="Téléphone" class="border p-2 rounded w-full">
                 </div>
             </div>
 
-            <div class="mt-4 flex justify-between">
-                <button type="button" @click="changeStep(1)" class="bg-gray-500 text-white px-4 py-2 rounded">Retour</button>
-                <button type="submit" :disabled="buttonLoading" class="px-4 py-2 min-w-28 bg-blue-600 text-white rounded-lg">
-                  <span v-if="!buttonLoading">Envoyer</span>
-                  <div v-else class="flex items-center">
-                    <svg class="mr-3 h-5 w-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span class="font-medium"> Envoie en cours ... </span>
-                  </div>
-                </button>
-            </div>
+            <NavigationButton 
+                :buttonLoading="buttonLoading" 
+                submitLabel="Envoyer"
+                @go-back="changeStep(1)" 
+            />
         </div>
     </form>
 </template>
+
 
 <script setup>
 import { ref } from "vue";
@@ -113,6 +114,7 @@ import Swal from "sweetalert2";
 import { onMounted } from "vue";
 import axios from 'axios';
 import AppDatas from '../../../Services/app.js';
+import NavigationButton from "../../NavigationButton.vue";
 
 const baseUrl = AppDatas.baseUrl;
 

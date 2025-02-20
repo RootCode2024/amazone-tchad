@@ -25,7 +25,8 @@ const routes = [
     { path: "/login", name: "Login", component: Login, meta: { guestOnly: true } },
     { path: "/email-verify", name: "EmailVerify", component: EmailVerify },
     { path: "/forgot_password", name: "ForgotPassword", component: ForgotPassword },
-    { path: "/password/reset/:token", name: "ResetPassword", component: ResetPassword },
+    { path: "/password/reset", name: "ResetPassword", component: ResetPassword },
+
 
     // Routes protégées
     {

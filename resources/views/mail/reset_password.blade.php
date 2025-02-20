@@ -18,7 +18,7 @@
           <tr>
             <td align="center" style="padding-bottom: 20px;">
               <h2 style="color: #dc2626; font-size: 24px;">🔐 Réinitialisation de votre mot de passe</h2>
-              <p style="color: #374151; font-size: 16px;">Bonjour <strong>[Nom du destinataire]</strong>,</p>
+              <p style="color: #374151; font-size: 16px;">Bonjour,</p>
               <p style="color: #4b5563;">Nous avons reçu une demande de réinitialisation de votre mot de passe. Cliquez sur le bouton ci-dessous pour définir un nouveau mot de passe.</p>
             </td>
           </tr>
@@ -26,7 +26,7 @@
           <!-- Bouton de réinitialisation -->
           <tr>
             <td align="center" style="padding: 20px;">
-              <a href="[Lien de réinitialisation]" style="background-color: #dc2626; color: #ffffff; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-size: 16px; display: inline-block;">Réinitialiser mon mot de passe</a>
+              <a href="{{ env('APP_URL') }}/password/reset?token={{ $token }}&email={{ $email }}" style="background-color: #dc2626; color: #ffffff; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-size: 16px; display: inline-block;">Réinitialiser mon mot de passe</a>
             </td>
           </tr>
 
@@ -41,8 +41,8 @@
           <!-- Footer -->
           <tr>
             <td align="center" style="padding-top: 20px;">
-              <p style="color: #4b5563; font-size: 14px;">Besoin d'aide ? Contactez-nous à <strong>[Email de support]</strong>.</p>
-              <p style="font-size: 14px; font-weight: bold; color: #1e40af;">[Nom de l'entreprise]</p>
+              <p style="color: #4b5563; font-size: 14px;">Besoin d'aide ? Contactez-nous à <strong>{{ env('APP_EMAIL') }}</strong>.</p>
+              <p style="font-size: 14px; font-weight: bold; color: #1e40af;">{{ config('app.name') }}</p>
             </td>
           </tr>
 

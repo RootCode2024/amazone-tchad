@@ -1,6 +1,6 @@
 <template>
   <AuthLayout>
-    <div class="max-w-md mx-auto bg-white p-6 rounded-md shadow-md">
+    <div class="max-w-md mx-auto bg-white p-6 rounded-md shadow-md" v-if="step === 1">
       <h2 class="text-2xl font-semibold text-center">Réinitialiser le mot de passe</h2>
       
       <!-- Message de succès ou d'erreur -->
@@ -16,6 +16,7 @@
             placeholder="Email"
             class="w-full px-4 py-2 border rounded-md mt-1"
             required
+            :readonly="true"
           />
         </div>
 
@@ -51,34 +52,37 @@
         </button>
       </form>
     </div>
+    <div class="max-w-md mx-auto bg-white p-6 rounded-md shadow-md" v-if="step === 2">
+      <p class="my-5">Mot de passe réinitialisé avec succès</p>
+      <router-link to="/login" class="my-5 bg-indigo-600 hover:bg-indigo-700 py-2 px-4 text-lg rounded text-white">Se connecter</router-link>
+    </div>
   </AuthLayout>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import axios from "axios";
+import { ref, onMounted } from 'vue';
 import AuthLayout from "../../Layouts/AuthLayout.vue";
-import AppDatas from '../../Services/app.js'
+import axios from 'axios';
+import AppDatas from "../../Services/app.js";
+import { RouterLink } from 'vue-router';
 
-
-const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
-
-
-
-// Définition des variables réactives
-const email = ref("");
+const email = ref(null);
 const password = ref("");
 const passwordConfirmation = ref("");
 const loading = ref(false);
 const errorMessage = ref(null);
 const successMessage = ref(null);
+const token = ref(null);
+const step = ref(1);
 
-// Récupérer token et email depuis l'URL
-const urlParams = new URLSearchParams(window.location.search);
-const token = window.location.pathname.split("/")[4]; // Récupérer le token depuis le chemin de l'URL
-const userEmail = urlParams.get("email");  // Récupérer l'email à partir des paramètres de l'URL
+// Récupérer le token et l'email depuis la query string
+onMounted(() => {
+  token.value = new URLSearchParams(window.location.search).get('token');
+  email.value = new URLSearchParams(window.location.search).get('email');
 
-email.value = userEmail;  // Remplir automatiquement le champ email dans le formulaire
+  console.log('Token:', token.value);
+  console.log('Email:', email.value);
+});
 
 const resetPassword = async () => {
   loading.value = true;
@@ -86,11 +90,11 @@ const resetPassword = async () => {
   successMessage.value = null;
 
   try {
-    const response = await axios.post(`${AppDatas.baseUrl}/password/reset`, {
+    const response = await axios.post(`${AppDatas.baseUrl}/password/reset/save`, {
       email: email.value,
       password: password.value,
       password_confirmation: passwordConfirmation.value,
-      token: token,
+      token: token.value,
     }, {
       headers: {
         'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content,
@@ -100,21 +104,21 @@ const resetPassword = async () => {
 
     successMessage.value = "Mot de passe réinitialisé avec succès.";
     loading.value = false;
-    console.log(response);
   } catch (error) {
-    loading.value = false;
     if (error.response && error.response.data) {
       errorMessage.value = error.response.data.message || "Une erreur est survenue.";
     } else {
       errorMessage.value = "Erreur réseau ou serveur.";
     }
+  } finally {
+    step.value = 2;
+    loading.value = false;
+    email.value = '';
+    password.value = '';
+    passwordConfirmation.value = '';
   }
-};
-
-
+}
 </script>
-
-
 
 <style scoped>
 /* Style spécifique à cette page */

@@ -90,86 +90,86 @@
     </div>
 </template>
 
-<script setup>
-import { onMounted, onUnmounted, ref, computed } from 'vue';
-import { useRouter, useRoute, RouterView } from "vue-router";
-import { Home, ListChecks, Users, LucideLock } from 'lucide-vue-next';
-import axios from "axios";
-import Logo from '../Assets/Images/logo.png';
-import Person from '../Assets/Images/person.png';
-import AppDatas from '../Services/app.js';
+    <script setup>
+    import { onMounted, onUnmounted, ref, computed } from 'vue';
+    import { useRouter, useRoute, RouterView } from "vue-router";
+    import { Home, ListChecks, Users, LucideLock } from 'lucide-vue-next';
+    import axios from "axios";
+    import Logo from '../Assets/Images/logo.png';
+    import Person from '../Assets/Images/person.png';
+    import AppDatas from '../Services/app.js';
 
-const isOpen = ref(false);
-const openDropDown = ref(false);
-const dropdownContainer = ref(null);
-const router = useRouter();
-const route = useRoute();
-const user = ref({});
+    const isOpen = ref(false);
+    const openDropDown = ref(false);
+    const dropdownContainer = ref(null);
+    const router = useRouter();
+    const route = useRoute();
+    const user = ref({});
 
-const toggleDropDown = () => {
-  openDropDown.value = !openDropDown.value;
-};
-
-
-const handleClickAway = (event) => {
-  if (dropdownContainer.value && !dropdownContainer.value.contains(event.target)) {
-    openDropDown.value = false;
-  }
-};
+    const toggleDropDown = () => {
+    openDropDown.value = !openDropDown.value;
+    };
 
 
-onMounted(() => {
-  document.addEventListener('click', handleClickAway);
-});
-
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickAway);
-});
-
-
-const isActive = (path) => route.path === path ? 'bg-gray-100 text-gray-950' : '';
-
-
-const getUserInfo = async () => {
-    try {
-        const response = await axios.get(`${AppDatas.baseUrl}/user`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
-        user.value = response.data;
-    } catch (error) {
-        console.error("Erreur lors de la récupération des données de l'utilisateur.", error);
+    const handleClickAway = (event) => {
+    if (dropdownContainer.value && !dropdownContainer.value.contains(event.target)) {
+        openDropDown.value = false;
     }
-};
+    };
 
-// Déconnexion
-const logout = async () => {
-    try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            console.error("Aucun token trouvé dans localStorage !");
-            return;
+
+    onMounted(() => {
+    document.addEventListener('click', handleClickAway);
+    });
+
+
+    onUnmounted(() => {
+    document.removeEventListener('click', handleClickAway);
+    });
+
+
+    const isActive = (path) => route.path === path ? 'bg-gray-100 text-gray-950' : '';
+
+
+    const getUserInfo = async () => {
+        try {
+            const response = await axios.get(`${AppDatas.baseUrl}/user`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+            });
+            user.value = response.data;
+        } catch (error) {
+            console.error("Erreur lors de la récupération des données de l'utilisateur.", error);
         }
+    };
 
-        await axios.post(`${AppDatas.baseUrl}/logout`, {}, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+    // Déconnexion
+    const logout = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                console.error("Aucun token trouvé dans localStorage !");
+                return;
+            }
 
-        localStorage.removeItem("token");
-        router.push("/login");
-    } catch (error) {
-        console.error("Erreur lors de la déconnexion", error);
-    }
-};
+            await axios.post(`${AppDatas.baseUrl}/logout`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
 
-// Initialisation
-onMounted(() => {
-    if(localStorage.getItem('token'))
-    {
-        getUserInfo();
-    }
-});
-</script>
+            localStorage.removeItem("token");
+            router.push("/login");
+        } catch (error) {
+            console.error("Erreur lors de la déconnexion", error);
+        }
+    };
+
+    // Initialisation
+    onMounted(() => {
+        if(localStorage.getItem('token'))
+        {
+            getUserInfo();
+        }
+    });
+    </script>
 
 <style scoped>
 /* Animation de la sidebar */

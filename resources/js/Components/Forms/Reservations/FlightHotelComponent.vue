@@ -3,15 +3,17 @@
         
         <!-- Étape 1 : Détails du vol -->
         <div v-if="step === 1">                
-            <div class="grid grid-cols-5 gap-4 py-5">
-                <h2 class="col-span-5 text-sm italic">Veuillez remplir les informations du vol pour continuer.</h2>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 py-5">
+                <h2 class="col-span-1 md:col-span-5 text-sm italic">Veuillez remplir les informations du vol pour continuer.</h2>
             </div>
             <hr>
-            <div class="flex justify-between space-x-4 mb-4">
+            
+            <!-- Type de vol & Passagers -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <!-- Sélection du type de vol -->
                 <div class="flex flex-col space-y-2 text-sm italic">
                     <label class="font-medium">Type de vol</label>
-                    <div class="flex items-center space-x-4">
+                    <div class="flex flex-wrap items-center gap-4">
                         <input type="radio" v-model="form.flight_type" value="one_way" id="one_way">
                         <label for="one_way">Aller simple</label>
                         
@@ -27,8 +29,7 @@
                 <div class="flex flex-col space-y-2 text-sm italic">
                     <label class="font-medium">Passagers et classe</label>
                     <div class="flex space-x-2">
-                        <input type="number" v-model="form.passengers" min="1" max="10" class="border p-2 rounded w-full" placeholder="Nombre de passagers">
-
+                        <input type="number" v-model="form.passengers" min="1" max="10" class="border p-2 rounded w-full" placeholder="Passagers">
                         <select v-model="form.flight_class" class="border p-2 rounded w-full">
                             <option value="economy">Économie</option>
                             <option value="business">Affaires</option>
@@ -39,7 +40,7 @@
             </div>
 
             <!-- Sélection des villes et dates -->
-            <div class="grid grid-cols-5 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 <div>
                     <label for="departure_city_id" class="block text-sm font-medium">Origine</label>
                     <select id="departure_city_id" v-model="form.departure_city_id" class="border p-2 rounded w-full">
@@ -51,7 +52,8 @@
                     <label for="destination_city_id" class="block text-sm font-medium">Destination</label>
                     <select id="destination_city_id" v-model="form.destination_city_id" class="border p-2 rounded w-full">
                         <option v-for="city in cities" :key="city.id" :value="city.id">{{ city.name }}</option>
-                    </select></div>
+                    </select>
+                </div>
 
                 <div>
                     <label for="departure_date" class="block text-sm font-medium">Date de départ</label>
@@ -60,26 +62,29 @@
 
                 <div>
                     <label for="return_date" class="block text-sm font-medium">Date de retour</label>
-                    <input type="date" id="return_date" v-model="form.return_date" class="border p-2 rounded w-full" :class="{ 'border-red-500 text-red-500': formErrors.return_date.error || form.flight_type == 'round_trip' }" :disabled="form.flight_type === 'one_way'">
+                    <input type="date" id="return_date" v-model="form.return_date" class="border p-2 rounded w-full" 
+                        :class="{ 'border-red-500 text-red-500': formErrors.return_date.error || form.flight_type === 'round_trip' }" 
+                        :disabled="form.flight_type === 'one_way'">
                 </div>
                 
                 <div>
-                    <label for="number_of_room" class="block text-sm font-medium">Nombre de chambre</label>
+                    <label for="number_of_room" class="block text-sm font-medium">Nombre de chambres</label>
                     <input type="number" id="number_of_room" min="1" max="20" v-model="form.number_of_room" class="border p-2 rounded w-full">
                 </div>
 
-                <div class="flex items-end">
-                    <button type="button" @click="changeStep(2)" class="bg-indigo-500 text-white px-6 py-2 rounded">Suivant</button>
+                <div class="flex items-end w-full">
+                    <button type="button" @click="changeStep(2)" class="bg-indigo-500 text-white px-6 py-2 rounded w-full md:w-auto">Suivant</button>
                 </div>
             </div>
         </div>
 
         <!-- Étape 2 : Informations du voyageur -->
         <div v-if="step === 2">
-            <div class="grid grid-cols-5 gap-4 py-5">
-                <h2 class="col-span-5 text-sm italic">Veuillez remplir les informations du voyageur pour valider.</h2>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 py-5">
+                <h2 class="col-span-1 md:col-span-5 text-sm italic">Veuillez remplir les informations du voyageur pour valider.</h2>
             </div>
-            <div class="grid grid-cols-3 gap-4">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700">Nom</label>
                     <input type="text" id="name" v-model="form.name" placeholder="Nom" class="border p-2 rounded w-full" :class="{ 'border-red-500 text-red-500': formErrors.name.error }">
@@ -96,22 +101,16 @@
                 </div>
             </div>
 
-            <div class="mt-4 flex justify-between">
-                <button type="button" @click="changeStep(1)" class="bg-gray-500 text-white px-4 py-2 rounded">Retour</button>
-                <button type="submit" :disabled="buttonLoading" class="px-4 py-2 min-w-28 bg-blue-600 text-white rounded-lg">
-                  <span v-if="!buttonLoading">Valider</span>
-                  <div v-else class="flex items-center">
-                    <svg class="mr-3 h-5 w-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span class="font-medium"> Envoie en cours ... </span>
-                  </div>
-                </button>
-            </div>
+            <!-- Boutons navigation -->
+            <NavigationButton 
+                :buttonLoading="buttonLoading" 
+                submitLabel="Envoyer"
+                @go-back="changeStep(1)" 
+            />
         </div>
     </form>
 </template>
+
 
 <script setup>
 import { ref } from "vue";
@@ -119,6 +118,7 @@ import Swal from "sweetalert2";
 import { onMounted } from "vue";
 import axios from 'axios';
 import AppDatas from '../../../Services/app.js';
+import NavigationButton from "../../NavigationButton.vue";
 
 const baseUrl = AppDatas.baseUrl;
 

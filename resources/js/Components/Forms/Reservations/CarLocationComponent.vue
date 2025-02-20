@@ -1,15 +1,15 @@
 <template>
-    <form @submit.prevent="submitForm()" class="p-6 flex flex-col space-y-4 max-w-4xl mx-auto">
+    <form @submit.prevent="submitForm()" class="p-6 flex flex-col space-y-4 max-w-4xl mx-auto w-full">
         
         <!-- Étape 1 : Détails de la location de voiture -->
         <div v-if="step === 1">                
-            <div class="grid grid-cols-5 gap-4 py-5">
-                <h2 class="col-span-5 text-sm italic">Veuillez remplir les informations de la location de voiture pour continuer.</h2>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 py-5">
+                <h2 class="col-span-1 md:col-span-5 text-sm italic text-center">Veuillez remplir les informations de la location de voiture pour continuer.</h2>
             </div>
             <hr>
             
             <!-- Sélection des dates -->
-            <div class="grid grid-cols-5 gap-4 py-2">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 py-2">
                 <div>
                     <label for="place_of_location" class="block text-sm font-medium">Lieu de location</label>
                     <select id="place_of_location" v-model="form.place_of_location" class="border p-2 rounded w-full">
@@ -31,18 +31,17 @@
                     <input type="number" v-model="form.age" min="18" class="border p-2 rounded w-full" placeholder="Âge du conducteur">
                 </div>
                 <div class="flex items-end">
-                    <button type="button" @click="changeStep(2)" class="bg-indigo-500 text-white px-6 py-2 rounded">Suivant</button>
+                    <button type="button" @click="changeStep(2)" class="bg-indigo-500 text-white px-6 py-2 rounded w-full">Suivant</button>
                 </div>
             </div>
-
         </div>
 
         <!-- Étape 2 : Informations du voyageur -->
         <div v-if="step === 2">
-            <div class="grid grid-cols-5 gap-4 py-5">
-                <h2 class="col-span-5 text-sm italic">Veuillez remplir les informations du voyageur pour valider.</h2>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 py-5">
+                <h2 class="col-span-1 md:col-span-5 text-sm italic text-center">Veuillez remplir les informations du voyageur pour valider.</h2>
             </div>
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700">Nom</label>
                     <input type="text" id="name" v-model="form.name" placeholder="Nom" class="border p-2 rounded w-full" :class="{ 'border-red-500 text-red-500': formErrors.name.error }">
@@ -59,19 +58,11 @@
                 </div>
             </div>
 
-            <div class="mt-4 flex justify-between">
-                <button type="button" @click="changeStep(1)" class="bg-gray-500 text-white px-4 py-2 rounded">Retour</button>
-                <button type="submit" :disabled="buttonLoading" class="px-4 py-2 min-w-28 bg-blue-600 text-white rounded-lg">
-                  <span v-if="!buttonLoading">Envoyer</span>
-                  <div v-else class="flex items-center">
-                    <svg class="mr-3 h-5 w-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span class="font-medium"> Envoie en cours ... </span>
-                  </div>
-                </button>
-            </div>
+            <NavigationButton 
+                :buttonLoading="buttonLoading" 
+                submitLabel="Envoyer"
+                @go-back="changeStep(1)" 
+            />
         </div>
     </form>
 </template>
@@ -81,6 +72,7 @@ import { ref, onMounted } from "vue";
 import Swal from "sweetalert2";
 import axios from 'axios';
 import AppDatas from '../../../Services/app.js';
+import NavigationButton from "../../NavigationButton.vue";
 
 const baseUrl = AppDatas.baseUrl;
 

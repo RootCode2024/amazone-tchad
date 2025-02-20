@@ -94,9 +94,9 @@ Route::prefix('bookings')->group(function () {
 Route::post('login', [AuthController::class, 'login'])->name('auth.login');
 Route::post('register', [AuthController::class, 'register'])->name('auth.register');
 
-
+Route::post('password/reset/save', [PasswordResetController::class, 'reset']);
 Route::get('password/reset/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
-
+Route::post('password/email', [PasswordResetController::class, 'sendResetLink'])->name('password.email');
 
 
 // Routes protégées avec Sanctum

@@ -10,9 +10,9 @@ Route::get('/', function () {
 });
 
 Route::get('/email/verify/{token}', [AuthController::class, 'verifyEmail'])->name('verification.verify');
+// Route::get('password/reset/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+// Route::post('password/reset', [PasswordResetController::class, 'reset']);
 
-Route::post('password/email', [PasswordResetController::class, 'sendResetLink'])->name('password.email');
-Route::post('password/reset', [PasswordResetController::class, 'reset']);
 
 
 

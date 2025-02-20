@@ -39,72 +39,70 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import axios from 'axios';
-import { useRouter } from 'vue-router';
-import AuthLayout from "../../Layouts/AuthLayout.vue";
-import  AppDatas from '../../Services/app.js'
+  import { ref } from 'vue';
+  import axios from 'axios';
+  import { useRouter } from 'vue-router';
+  import AuthLayout from "../../Layouts/AuthLayout.vue";
+  import  AppDatas from '../../Services/app.js'
 
-const email = ref('');
-const loading = ref(false);
-const errorMessage = ref('');
-const successMessage = ref('');
-const router = useRouter();
+  const email = ref('');
+  const loading = ref(false);
+  const errorMessage = ref('');
+  const successMessage = ref('');
+  const router = useRouter();
 
-const sendResetLink = async () => {
-  if (!email.value) {
-    errorMessage.value = 'L\'email est requis.';
-    return;
-  }
-
-  loading.value = true;
-  errorMessage.value = '';
-  successMessage.value = '';
-
-  try {
-    const response = await axios.post(`${AppDatas.baseUrl}/password/email`, { email: email.value });
-
-    successMessage.value = 'Un lien de réinitialisation a été envoyé à votre adresse email.';
-    email.value = '';
-  } catch (error) {
-    errorMessage.value = 'Une erreur est survenue. Veuillez réessayer.';
-  } finally {
-    loading.value = false;
-  }
+  const sendResetLink = async () => {
+    loading.value = true;
+    try {
+        const response = await axios.post(`${AppDatas.baseUrl}/password/email`, {
+            email: email.value
+        });
+    } catch (error) {
+        if (error.response) {
+          
+            console.error("Erreur: ", error.response.data);
+            alert("Une erreur est survenue : " + error.response.data.message);
+        } else {
+            console.error("Erreur inconnue : ", error);
+        }
+    } finally {
+      loading.value = false;
+      email.value = '';
+    }
 };
+
 </script>
 
 <style scoped>
-/* Styles personnalisés pour la page de mot de passe oublié */
-.container {
-  max-width: 600px;
-  margin: auto;
-}
+  .container {
+    max-width: 600px;
+    margin: auto;
+  }
 
-.input-field {
-  padding: 10px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
+  .input-field {
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
 
-.btn-submit {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
+  .btn-submit {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
 
-.btn-submit:disabled {
-  background-color: #bdbdbd;
-}
+  .btn-submit:disabled {
+    background-color: #bdbdbd;
+  }
 
-.text-blue-600 {
-  color: #3182ce;
-}
+  .text-blue-600 {
+    color: #3182ce;
+  }
 
-.text-gray-600 {
-  color: #4a5568;
-}
+  .text-gray-600 {
+    color: #4a5568;
+  }
 </style>
