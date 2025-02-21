@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +13,7 @@
           <!-- En-tête -->
           <tr>
             <td align="center" style="padding-bottom: 20px;">
-              <h2 style="color: #b91c1c; font-size: 24px;">⚠️ Changement de statut</h2>
+              <h2 style="color: #b91c1c; font-size: 24px;">⚠️ Changement de statut ({{ $type }})</h2>
               <p style="color: #374151; font-size: 16px;">Bonjour <strong>{{ $reservation->customer->name }}</strong>,</p>
               <p style="color: #4b5563;">Nous vous informons que le statut de votre demande a changé.</p>
             </td>
@@ -43,9 +43,27 @@
           <tr>
             <td style="padding: 20px;">
               <p style="color: #4b5563; font-size: 14px;">Malheureusement, après examen, nous n'avons pas pu approuver votre demande pour la raison suivante :</p>
-              <p style="color: #b91c1c; font-size: 16px; font-weight: bold;">{{ $reservation->note }}</p><p class="text-blue-600 text-lg font-thin">
-                Date de départ trouvée : {{ \Carbon\Carbon::parse($reservation->departure_date)->format('d F Y') }}
-              </p>            
+              <p style="color: #b91c1c; font-size: 16px; font-weight: bold;">{{ $reservation->note }}</p>
+              <hr>
+              @if ($type === 'VOL' || $type === 'VOL + HOTEL')
+                <p class="text-blue-600 text-lg font-thin">
+                  Date de départ trouvée : {{ \Carbon\Carbon::parse($reservation->departure_date)->locale('fr')->format('d F Y') }}
+                </p>
+                @elseif ($type === 'HOTEL')
+                <p class="text-blue-600 text-lg font-thin">
+                  Date de d'arrivée : {{ \Carbon\Carbon::parse($reservation->arrival_date)->locale('fr')->format('d F Y') }}
+                </p>            
+                <p class="text-blue-600 text-lg font-thin">
+                  Date de retour : {{ \Carbon\Carbon::parse($reservation->return_date)->locale('fr')->format('d F Y') }}
+                </p>
+                @elseif ($type === 'LOCATION') 
+                <p class="text-blue-600 text-lg font-thin">
+                  Date de début : {{ \Carbon\Carbon::parse($reservation->started_date)->locale('fr')->format('d F Y') }}
+                </p>            
+                <p class="text-blue-600 text-lg font-thin">
+                  Date de fin : {{ \Carbon\Carbon::parse($reservation->ended_date)->locale('fr')->format('d F Y') }}
+                </p>
+              @endif    
               <p style="color: blue; font-size: 16px; font-weight: bold;">Prix : {{ number_format($reservation->price, 0, ',', ' ') }} F CFA</p>
               
               <p style="color: #4b5563; font-size: 14px;">Si vous souhaitez obtenir plus d’informations ou contester cette décision, vous pouvez nous contacter via le lien ci-dessous.</p>

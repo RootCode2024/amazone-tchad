@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div v-if="isLoading" class="flex justify-center items-center min-h-[300px]">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500"></div>
+  </div>
+  <div v-else>
       <!-- Message de bienvenue -->
       <div class="mb-6 p-6 bg-blue-600 text-white rounded-lg shadow-md">
         <h1 class="text-3xl font-bold">👋 Heureux de vous revoir, <span class="italic">Admin</span> !</h1>
@@ -43,6 +46,8 @@ import { PlaneTakeoff, Hotel, Car, ListChecks, Plus, BarChartBig } from 'lucide-
 import axios from 'axios';
 import AppDatas from '../../Services/app.js'
 
+const isLoading = ref(false)
+
 const motivationMessages = [
   "Chaque réservation est une nouvelle aventure en route ! 🚀",
   "Continuez à offrir des expériences de voyage inoubliables ! 🌍",
@@ -60,11 +65,14 @@ const stats = ref({
 });
 
 const fetchDatas = async () => {
+  isLoading.value = true
   try {
     const response = await axios.get(`${AppDatas.baseUrl}/dashboard`);
     stats.value = response.data;
   } catch (error) {
     console.error("Erreur lors de la récupération des données :", error);
+  } finally {
+    isLoading.value = false
   }
 };
 

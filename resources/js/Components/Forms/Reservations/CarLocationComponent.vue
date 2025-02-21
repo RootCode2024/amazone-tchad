@@ -18,12 +18,12 @@
                 </div>
                 <div>
                     <label for="started_date" class="block text-sm font-medium">Date de début</label>
-                    <input type="date" id="started_date" v-model="form.started_date" class="border p-2 rounded w-full" :class="{ 'border-red-500 text-red-500': formErrors.started_date.error }">
+                    <input type="date" id="started_date" v-model="form.started_date" class="border p-2 rounded w-full" :min="minDate" :class="{ 'border-red-500 text-red-500': formErrors.started_date.error }">
                 </div>
 
                 <div>
                     <label for="ended_date" class="block text-sm font-medium">Date de fin</label>
-                    <input type="date" id="ended_date" v-model="form.ended_date" class="border p-2 rounded w-full" :class="{ 'border-red-500 text-red-500': formErrors.ended_date.error }">
+                    <input type="date" id="ended_date" v-model="form.ended_date" class="border p-2 rounded w-full" :min="minDate" :class="{ 'border-red-500 text-red-500': formErrors.ended_date.error }">
                 </div>
 
                 <div>
@@ -90,6 +90,7 @@ const form = ref({
     phone: "",
 });
 
+const minDate = new Date().toISOString().split('T')[0]
 const formErrors = ref({
     started_date: { error: false, message: "Veuillez sélectionner une date de début." },
     ended_date: { error: false, message: "Veuillez sélectionner une date de fin." },

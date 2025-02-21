@@ -24,12 +24,12 @@
 
                 <div>
                     <label for="arrival_date" class="block text-sm font-medium">Date d'arrivée</label>
-                    <input type="date" id="arrival_date" v-model="form.arrival_date" class="border p-2 rounded w-full" :class="{ 'border-red-500 text-red-500': formErrors.arrival_date.error }">
+                    <input type="date" id="arrival_date" v-model="form.arrival_date" class="border p-2 rounded w-full" :min="minDate" :class="{ 'border-red-500 text-red-500': formErrors.arrival_date.error }">
                 </div>
 
                 <div>
                     <label for="return_date" class="block text-sm font-medium">Date de retour</label>
-                    <input type="date" id="return_date" v-model="form.return_date" class="border p-2 rounded w-full" :class="{ 'border-red-500 text-red-500': formErrors.return_date.error }">
+                    <input type="date" id="return_date" v-model="form.return_date" class="border p-2 rounded w-full" :min="minDate" :class="{ 'border-red-500 text-red-500': formErrors.return_date.error }">
                 </div>
                 <div class="flex items-end">
                     <button type="button" @click="changeStep(2)" class="bg-indigo-500 text-white px-6 py-2 rounded w-full">Suivant</button>
@@ -93,6 +93,7 @@
         phone: "",
     });
 
+    const minDate = new Date().toISOString().split('T')[0]
     const formErrors = ref({
         arrival_date: { error: false, message: "Veuillez sélectionner une date d'arrivée." },
         return_date: { error: false, message: "Veuillez sélectionner une date de retour." },

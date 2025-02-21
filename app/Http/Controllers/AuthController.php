@@ -28,12 +28,24 @@ class AuthController extends Controller
         }
     
         try {
+
+            $user = User::where("role", "admin")->first();
+
+            if($user)
+            {
+                $role = 'manager';
+            }
+            else
+            {
+                $role = 'admin';
+            }
+
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'verification_token' => Str::random(60),
-                'role' => 'manager'
+                'role' => $role
             ]);
     
             

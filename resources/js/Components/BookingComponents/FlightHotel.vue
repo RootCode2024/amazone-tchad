@@ -29,7 +29,7 @@
         </thead>
         <tbody>
           <tr v-if="props.flighthotels.length === 0">
-            <td colspan="7" class="text-center text-red-400 p-3">Aucun vol + hotel enregistré...</td>
+            <span colspan="7" class="text-center text-indigo-700 p-3">Chargement ...</span>
           </tr>
           <tr v-for="(flighthotel, index) in filteredFlights" :key="flighthotel.id" class="border-b">
             <td class="p-3">{{ index + 1 }}</td>
@@ -103,7 +103,7 @@
           </div>
           <div class="py-2">
             <label for="departure_date">Date de départ</label>
-            <input type="date" v-model="formStatus.departureDate" class="w-full border p-2 rounded-lg" />
+            <input type="date" :min="minDate" v-model="formStatus.departureDate" class="w-full border p-2 rounded-lg" />
           </div>
           <div class="py-2">
             <label for="price">Prix</label>
@@ -186,6 +186,7 @@
       required: true,
     },
   });
+  const minDate = new Date().toISOString().split('T')[0]
 
   const search = ref("");
   const errorMessage = ref("");

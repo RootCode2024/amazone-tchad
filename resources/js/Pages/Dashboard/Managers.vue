@@ -27,10 +27,13 @@
             <th class="px-4 py-2 cursor-pointer" @click="sortBy('name')">Nom ⬍</th>
             <th class="px-4 py-2 cursor-pointer" @click="sortBy('email')">Email ⬍</th>
             <th class="px-4 py-2 cursor-pointer" @click="sortBy('role')">Role ⬍</th>
-            <th class="px-4 py-2 cursor-pointer">Action ⬍</th>
+            <th class="px-4 py-2 cursor-pointer" v-if="user.role === 'admin'">Action ⬍</th>
           </tr>
         </thead>
         <tbody>
+          <tr v-if="managers.length === 0">
+            <td colspan="7" class="text-center text-indigo-700 p-3">Chargement ...</td>
+          </tr>
           <tr v-for="manager in paginatedManagers" :key="manager.id" class="border-t"  :class="(user.email === manager.email) ? 'bg-indigo-300' : ''">
               <td class="px-4 py-2">{{ manager.id }}</td>
               <td class="px-4 py-2 font-bold">{{ manager.name }}</td>
@@ -39,7 +42,7 @@
                   <span v-if="manager.role === 'admin'" class="bg-slate-800 text-white px-2 py-1 rounded">Admin</span>
                   <span v-else class="bg-slate-400 text-gray-950 px-2 py-1 rounded">Manager</span>
               </td>
-              <td class="flex px-4 py-2 space-x-3">
+              <td class="flex px-4 py-2 space-x-3" v-if="user.role === 'admin'">
                   <router-link
                    v-if="manager.role !== 'admin'"
                   :to="`/dashboard/managers/${manager.id}`"

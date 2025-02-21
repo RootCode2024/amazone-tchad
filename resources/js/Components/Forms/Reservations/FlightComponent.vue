@@ -63,13 +63,14 @@
 
                 <div>
                     <label for="departure_date" class="block text-sm font-medium">Date de départ</label>
-                    <input type="date" id="departure_date" v-model="form.departure_date" class="border p-2 rounded w-full">
+                    <input type="date" id="departure_date" v-model="form.departure_date" class="border p-2 rounded w-full" :min="minDate">
                 </div>
 
                 <div>
                     <label for="return_date" class="block text-sm font-medium">Date de retour</label>
-                    <input type="date" id="return_date" v-model="form.return_date" class="border p-2 rounded w-full" :disabled="form.flight_type === 'one_way'">
+                    <input type="date" id="return_date" v-model="form.return_date" class="border p-2 rounded w-full" :min="minDate" :disabled="form.flight_type === 'one_way'">
                 </div>
+
                 <div class="flex items-end">
                     <button type="button" @click="changeStep(2)" class="bg-indigo-500 text-white px-6 py-2 rounded w-full">Suivant</button>
                 </div>
@@ -134,7 +135,7 @@ const form = ref({
     email: "",
     phone: "",
 });
-
+const minDate = new Date().toISOString().split('T')[0]
 const formErrors = ref({
     departure_date: { error: false, message: "Veuillez sélectionner une date de départ." },
     return_date: { error: false, message: "Veuillez sélectionner une date de retour." },

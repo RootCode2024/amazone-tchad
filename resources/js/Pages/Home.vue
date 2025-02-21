@@ -6,7 +6,7 @@
         <!-- Overlay for darkening the background -->
 
         <img :src="Logo" alt="Logo" class="h-24 sm:h-36 z-50">
-        <p class="w-full sm:w-3/4 md:w-1/2 flex z-50 justify-center text-center italic font-bold px-2">
+        <p class="w-full sm:w-3/4 md:w-1/2 flex z-50 justify-center text-center italic font-bold px-2 text-white">
             Chaque Voyageur est unique et a sa propre vision du voyage. Que ce soit pour partir quelques heures de chez vous ou à l’autre bout du monde pour découvrir, visiter, rencontrer, vous émerveiller…..
         </p>
 

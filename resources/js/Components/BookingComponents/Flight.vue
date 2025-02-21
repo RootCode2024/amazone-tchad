@@ -16,7 +16,7 @@
       <!-- Tableau des réservations -->
       <table class="w-full border-collapse border rounded-lg">
         <thead>
-          <tr class="bg-gray-200">
+          <tr class="bg-gray-100">
             <th class="p-3 text-left">#</th>
             <th class="p-3 text-left">Client</th>
             <th class="p-3 text-left">Origine</th>
@@ -29,10 +29,10 @@
         </thead>
         <tbody>
           <tr v-if="props.flights.length === 0">
-            <td colspan="7" class="text-center text-red-400 p-3">Aucun vol enregistré...</td>
+            <span colspan="7" class="text-center text-indigo-700 p-3">Chargement ...</span>
           </tr>
           
-          <tr v-for="(flight, index) in filteredFlights" :key="flight.id" class="border-b">
+          <tr v-for="(flight, index) in filteredFlights" :key="flight.id" class="border-t">
             <td class="p-3">{{ index + 1 }}</td>
             <td class="p-3">{{ flight.customer.name }}</td>
             <td class="p-3">{{ flight.origin.name }}</td>
@@ -103,7 +103,7 @@
           </div>
           <div class="py-2">
             <label for="departure_date">Date de départ</label>
-            <input type="date" v-model="formStatus.departureDate" class="w-full border p-2 rounded-lg" />
+            <input type="date" :min="minDate" v-model="formStatus.departureDate" class="w-full border p-2 rounded-lg" />
           </div>
           <div class="py-2">
             <label for="price">Prix</label>
@@ -187,6 +187,7 @@
     },
   });
 
+  const minDate = new Date().toISOString().split('T')[0]
   const search = ref("");
   const errorMessage = ref("");
   const itemsPerPage = 5;

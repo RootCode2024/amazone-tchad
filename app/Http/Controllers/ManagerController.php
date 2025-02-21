@@ -107,6 +107,7 @@ class ManagerController extends Controller
                 'email' => $request->email,
                 'address' => $request->address ?? '',
                 'password' => Hash::make($password),
+                'role' => 'manager',
                 'verification_token' => Str::random(60),
             ]);
     

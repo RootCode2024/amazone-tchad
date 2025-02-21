@@ -71,6 +71,7 @@
     import { ref, watchEffect } from 'vue'
     import axios from 'axios'
     import Swal from "sweetalert2"
+    import { useUserStore } from "@/stores/userStore"
 
 
     const authUser = ref({})
@@ -78,6 +79,7 @@
     const password = ref({ current: '', new: '', confirm: '' })
     const loadingBtnProfile = ref(false)
     const loadingBtnPassword = ref(false)
+    const userStore = useUserStore()
 
 
     const getUserInfo = async () => {
@@ -115,7 +117,8 @@
         
         try {
             await axios.put(`${AppDatas.baseUrl}/managers`, datas)
-            getUserInfo();
+            console.log(datas.name)
+            userStore.updateUser({ name: datas.name });
             toastFunction('success', 'Profil mis à jour avec succès ! 🚀')
         } catch (error) {
             console.error('Erreur lors de la mise à jour du profil', error)

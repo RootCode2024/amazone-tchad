@@ -24,7 +24,7 @@
         </thead>
         <tbody>
           <tr v-if="customers.length === 0">
-            <td colspan="7" class="text-center text-red-400 p-3">Aucun client enregistré ...</td>
+            <td colspan="7" class="text-center text-indigo-700 p-3">Chargement ...</td>
           </tr>
 
           <tr v-for="customer in paginatedCustomers" :key="customer.id" class="border-t">
