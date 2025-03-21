@@ -3,7 +3,6 @@
         style="background-image: url('../Assets/Images/background.jpg')">
 
         <div class="absolute inset-0 bg-black opacity-50"></div>
-        <!-- Overlay for darkening the background -->
 
         <img :src="Logo" alt="Logo" class="h-24 sm:h-36 z-50">
         <p class="w-full sm:w-3/4 md:w-1/2 flex z-50 justify-center text-center italic font-bold px-2 text-white">
@@ -44,39 +43,38 @@
 
 
 <script setup>
-import { ref, computed } from "vue";
-import FlightComponent from "../Components/Forms/Reservations/FlightComponent.vue";
-import HotelComponent from "../Components/Forms/Reservations/HotelComponent.vue";
-import CarLocationComponent from "../Components/Forms/Reservations/CarLocationComponent.vue";
-import FlightHotelComponent from "../Components/Forms/Reservations/FlightHotelComponent.vue";
+    import { ref, computed } from "vue";
+    import FlightComponent from "../Components/Forms/Reservations/FlightComponent.vue";
+    import HotelComponent from "../Components/Forms/Reservations/HotelComponent.vue";
+    import CarLocationComponent from "../Components/Forms/Reservations/CarLocationComponent.vue";
+    import FlightHotelComponent from "../Components/Forms/Reservations/FlightHotelComponent.vue";
 
-import PlaneIcon from "../Assets/svg/plane.png";
-import HotelIcon from "../Assets/svg/hotel.png";
-import PlaneHotelIcon from "../Assets/svg/planehotel.png";
-import CarLocationIcon from "../Assets/svg/car.png";
+    import PlaneIcon from "../Assets/svg/plane.png";
+    import HotelIcon from "../Assets/svg/hotel.png";
+    import PlaneHotelIcon from "../Assets/svg/planehotel.png";
+    import CarLocationIcon from "../Assets/svg/car.png";
 
-import Logo from '../Assets/Images/logo.png';
+    import Logo from '../Assets/Images/logo.png';
 
-const activeTab = ref("vols");
+    const activeTab = ref("vols");
 
-const tabs = [
-    { key: "vols", label: "Vols", icon: PlaneIcon, component: FlightComponent },
-    { key: "hotels", label: "Hôtels", icon: HotelIcon, component: HotelComponent },
-    { key: "volhotel", label: "Vol + Hôtel", icon: PlaneHotelIcon, component: FlightHotelComponent },
-    { key: "voiture", label: "Location de voiture", icon: CarLocationIcon, component: CarLocationComponent }
-];
+    const tabs = [
+        { key: "vols", label: "Vols", icon: PlaneIcon, component: FlightComponent },
+        { key: "hotels", label: "Hôtels", icon: HotelIcon, component: HotelComponent },
+        { key: "volhotel", label: "Vol + Hôtel", icon: PlaneHotelIcon, component: FlightHotelComponent },
+        { key: "voiture", label: "Location de voiture", icon: CarLocationIcon, component: CarLocationComponent }
+    ];
 
-const activeComponent = computed(() => {
-    return tabs.find(tab => tab.key === activeTab.value)?.component || FlightComponent;
-});
+    const activeComponent = computed(() => {
+        return tabs.find(tab => tab.key === activeTab.value)?.component || FlightComponent;
+    });
 </script>
 
 <style>
-/* Ajoute des animations */
-.v-enter-active, .v-leave-active {
-    transition: opacity 0.3s ease;
-}
-.v-enter-from, .v-leave-to {
-    opacity: 0;
-}
+    .v-enter-active, .v-leave-active {
+        transition: opacity 0.3s ease;
+    }
+    .v-enter-from, .v-leave-to {
+        opacity: 0;
+    }
 </style>

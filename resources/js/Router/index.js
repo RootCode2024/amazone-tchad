@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import axios from "axios";
 
-// Importation des composants
+
 import Home from '../Pages/Home.vue';
 import Dashboard from '../Pages/Dashboard/Index.vue';
 import Register from '../Pages/Auth/Register.vue';
@@ -20,6 +20,7 @@ import ForgotPassword from '../Pages/Auth/ForgotPassword.vue';
 import ResetPassword from "../Pages/Auth/ResetPassword.vue";
 
 const routes = [
+    //Routes publiques
     { path: '/', component: Home },
     { path: "/register", name: "Register", component: Register, meta: { guestOnly: true } },
     { path: "/login", name: "Login", component: Login, meta: { guestOnly: true } },
@@ -31,7 +32,7 @@ const routes = [
     // Routes protégées
     {
         path: '/dashboard',
-        component: AppLayout,  // Utilisation d'un layout global
+        component: AppLayout,
         meta: { requiresAuth: true },
         children: [
             { path: '', component: Dashboard },
@@ -53,10 +54,10 @@ const router = createRouter({
     routes,
 });
 
-// ✅ Fonction pour vérifier l'authentification
+
 const isAuthenticated = async () => {
     const token = localStorage.getItem("token");
-    
+
     if (!token) return false;
 
     try {
@@ -67,19 +68,18 @@ const isAuthenticated = async () => {
         return response.status === 200;
     } catch (error) {
         console.error("Authentication failed:", error);
-        localStorage.removeItem("token"); // Supprime le token expiré
+        localStorage.removeItem("token");
         return false;
     }
 };
 
-// ✅ Middleware de navigation
 router.beforeEach(async (to, from, next) => {
     const isLoggedIn = await isAuthenticated();
 
     if (to.meta.requiresAuth && !isLoggedIn) {
-        next("/login"); // Redirection vers la page de connexion
+        next("/login");
     } else if (to.meta.guestOnly && isLoggedIn) {
-        next("/dashboard"); // Empêcher les utilisateurs connectés d’accéder à /login ou /register
+        next("/dashboard");
     } else {
         next();
     }
